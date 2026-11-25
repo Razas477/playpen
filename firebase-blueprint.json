@@ -1,0 +1,354 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "Authenticated customer profile, notification settings, and synced wishlist.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "displayName": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "email": { "type": "string", "format": "email", "minLength": 3, "maxLength": 200 },
+        "photoURL": { "type": "string", "maxLength": 600 },
+        "phone": { "type": "string", "maxLength": 32 },
+        "preferredEmirate": { "type": "string", "maxLength": 60 },
+        "marketingOptIn": { "type": "boolean" },
+        "smsUpdates": { "type": "boolean" },
+        "wishlistIds": { "type": "array", "description": "Bounded list of wishlisted playpen product IDs (max 60)." },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "displayName", "email", "marketingOptIn", "smsUpdates", "wishlistIds", "createdAt", "updatedAt"]
+    },
+    "Category": {
+      "title": "Category",
+      "description": "PLAYPEN curated playpen collections and navigation metadata.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "slug": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "label": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "shortDesc": { "type": "string", "maxLength": 240 },
+        "ageOrNote": { "type": "string", "maxLength": 80 },
+        "group": { "type": "string", "enum": ["playpen", "collection", "architectural"] },
+        "image": { "type": "string", "maxLength": 300000 },
+        "displayOrder": { "type": "number" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "slug", "label", "group", "displayOrder", "updatedAt"]
+    },
+    "Product": {
+      "title": "Product",
+      "description": "Baby playpen product master record synced between storefront and admin dashboard.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "name": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "subtitle": { "type": "string", "maxLength": 160 },
+        "categoryId": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "categoryLabel": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "subCategory": { "type": "string", "maxLength": 80 },
+        "priceAed": { "type": "number" },
+        "image": { "type": "string", "maxLength": 300000 },
+        "dimensions": { "type": "string", "maxLength": 120 },
+        "dimensionsGroup": { "type": "string", "maxLength": 40 },
+        "material": { "type": "string", "maxLength": 200 },
+        "materialGroup": { "type": "string", "maxLength": 60 },
+        "weightCapacity": { "type": "string", "maxLength": 60 },
+        "ageSuitability": { "type": "string", "maxLength": 80 },
+        "safetySpecs": { "type": "array", "description": "Bounded list of safety certifications & hardware specs (max 12)." },
+        "foldingAndStorage": { "type": "string", "maxLength": 400 },
+        "deliveryInfo": { "type": "string", "maxLength": 240 },
+        "careNote": { "type": "string", "maxLength": 240 },
+        "originNote": { "type": "string", "maxLength": 240 },
+        "description": { "type": "string", "maxLength": 1000 },
+        "featuredTag": { "type": "string", "maxLength": 80 },
+        "sizes": { "type": "array", "description": "Bounded list of structural configuration footprints (max 20)." },
+        "unavailableSizes": { "type": "array", "description": "Bounded list of out-of-stock configurations (max 20)." },
+        "colors": { "type": "array", "description": "Bounded list of finish swatch maps (max 15)." },
+        "gallery": { "type": "array", "description": "Bounded list of product gallery image maps (max 8)." },
+        "benefits": { "type": "array", "description": "Bounded list of architectural highlights (max 12)." },
+        "bundleIncludes": { "type": "array", "description": "Bounded list of included playpen components (max 12)." },
+        "inStock": { "type": "boolean" },
+        "isFeatured": { "type": "boolean" },
+        "isNewArrival": { "type": "boolean" },
+        "isBestSeller": { "type": "boolean" },
+        "active": { "type": "boolean" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "name", "categoryId", "categoryLabel", "priceAed", "image", "active", "updatedAt"]
+    },
+    "ProductSize": {
+      "title": "ProductSize",
+      "description": "Playpen structural configuration footprint record.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "productId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "code": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "label": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "footprintCm": { "type": "string", "maxLength": 60 },
+        "panelHeightCm": { "type": "string", "maxLength": 40 },
+        "available": { "type": "boolean" },
+        "sortOrder": { "type": "number" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "productId", "code", "label", "available", "sortOrder", "updatedAt"]
+    },
+    "ProductColor": {
+      "title": "ProductColor",
+      "description": "Finish and upholstery colorway option associated with a playpen.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "productId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "name": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "hex": { "type": "string", "minLength": 4, "maxLength": 16 },
+        "sortOrder": { "type": "number" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "productId", "name", "hex", "sortOrder", "updatedAt"]
+    },
+    "Inventory": {
+      "title": "Inventory",
+      "description": "Live UAE warehouse stock availability per playpen configuration and colorway SKU.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "productId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "sizeCode": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "colorName": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "sku": { "type": "string", "minLength": 2, "maxLength": 128 },
+        "stockQty": { "type": "number" },
+        "reservedQty": { "type": "number" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "productId", "sizeCode", "colorName", "sku", "stockQty", "reservedQty", "updatedAt"]
+    },
+    "CustomerAddress": {
+      "title": "CustomerAddress",
+      "description": "Saved UAE delivery address owned by an authenticated customer.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "userId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "label": { "type": "string", "minLength": 1, "maxLength": 60 },
+        "recipientName": { "type": "string", "minLength": 2, "maxLength": 120 },
+        "phone": { "type": "string", "minLength": 7, "maxLength": 32 },
+        "emirate": { "type": "string", "minLength": 2, "maxLength": 60 },
+        "area": { "type": "string", "minLength": 2, "maxLength": 100 },
+        "streetAddress": { "type": "string", "minLength": 4, "maxLength": 300 },
+        "isDefault": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "label", "recipientName", "phone", "emirate", "area", "streetAddress", "isDefault", "createdAt", "updatedAt"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "Customer order header stored permanently in Firestore without payment card secrets.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "orderNumber": { "type": "string", "minLength": 4, "maxLength": 32 },
+        "idempotencyKey": { "type": "string", "minLength": 8, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "userId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "customerName": { "type": "string", "minLength": 2, "maxLength": 120 },
+        "customerEmail": { "type": "string", "format": "email", "minLength": 3, "maxLength": 200 },
+        "customerPhone": { "type": "string", "minLength": 7, "maxLength": 32 },
+        "emirate": { "type": "string", "minLength": 2, "maxLength": 60 },
+        "area": { "type": "string", "minLength": 2, "maxLength": 100 },
+        "deliveryAddress": { "type": "string", "minLength": 4, "maxLength": 360 },
+        "subtotalAed": { "type": "number" },
+        "deliveryFeeAed": { "type": "number" },
+        "totalAed": { "type": "number" },
+        "paymentMethod": { "type": "string", "enum": ["Cash on Delivery"] },
+        "paymentStatus": { "type": "string", "enum": ["Pending on Delivery", "Paid on Delivery", "Refunded", "Cancelled"] },
+        "orderStatus": {
+          "type": "string",
+          "enum": [
+            "Order Placed",
+            "Order Confirmed",
+            "Processing",
+            "Packed",
+            "Shipped",
+            "Out for Delivery",
+            "Delivered",
+            "Cancelled"
+          ]
+        },
+        "giftWrap": { "type": "boolean" },
+        "giftNote": { "type": "string", "maxLength": 280 },
+        "estimatedDelivery": { "type": "string", "maxLength": 120 },
+        "courierName": { "type": "string", "maxLength": 80 },
+        "trackingNumber": { "type": "string", "maxLength": 80 },
+        "cancellationReason": { "type": "string", "maxLength": 280 },
+        "itemCount": { "type": "number" },
+        "itemsSummary": { "type": "array", "description": "Bounded preview summary (max 25 items) for immediate account listing." },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "id",
+        "orderNumber",
+        "idempotencyKey",
+        "userId",
+        "customerName",
+        "customerEmail",
+        "customerPhone",
+        "emirate",
+        "area",
+        "deliveryAddress",
+        "subtotalAed",
+        "deliveryFeeAed",
+        "totalAed",
+        "paymentMethod",
+        "paymentStatus",
+        "orderStatus",
+        "giftWrap",
+        "estimatedDelivery",
+        "itemCount",
+        "itemsSummary",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "OrderItem": {
+      "title": "OrderItem",
+      "description": "Individual playpen line item tied atomically to an Order.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "orderId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "userId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "productId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "productName": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "productImage": { "type": "string", "maxLength": 300000 },
+        "selectedSize": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "selectedColor": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "quantity": { "type": "number" },
+        "unitPriceAed": { "type": "number" },
+        "lineTotalAed": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "id",
+        "orderId",
+        "userId",
+        "productId",
+        "productName",
+        "productImage",
+        "selectedSize",
+        "selectedColor",
+        "quantity",
+        "unitPriceAed",
+        "lineTotalAed",
+        "createdAt"
+      ]
+    },
+    "OrderTrackingHistory": {
+      "title": "OrderTrackingHistory",
+      "description": "Timestamped order status milestone for customer tracking timelines.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "orderId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "userId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "status": {
+          "type": "string",
+          "enum": [
+            "Order Placed",
+            "Order Confirmed",
+            "Processing",
+            "Packed",
+            "Shipped",
+            "Out for Delivery",
+            "Delivered",
+            "Cancelled"
+          ]
+        },
+        "note": { "type": "string", "minLength": 1, "maxLength": 280 },
+        "location": { "type": "string", "maxLength": 120 },
+        "courierName": { "type": "string", "maxLength": 80 },
+        "trackingNumber": { "type": "string", "maxLength": 80 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "orderId", "userId", "status", "note", "createdAt"]
+    },
+    "StoreSettings": {
+      "title": "StoreSettings",
+      "description": "Storefront delivery fee, threshold, and courier settings managed by Admin.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "freeShippingThresholdAed": { "type": "number" },
+        "standardDeliveryFeeAed": { "type": "number" },
+        "defaultCourierName": { "type": "string", "maxLength": 80 },
+        "supportPhone": { "type": "string", "maxLength": 32 },
+        "atelierLocation": { "type": "string", "maxLength": 160 },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "freeShippingThresholdAed", "standardDeliveryFeeAed", "defaultCourierName", "updatedAt"]
+    },
+    "Admin": {
+      "title": "Admin",
+      "description": "Trusted PLAYPEN storefront administrator marker document.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "email": { "type": "string", "format": "email", "maxLength": 200 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "Authenticated customer profile, preferences, and wishlist."
+    },
+    "/categories/{categoryId}": {
+      "schema": { "$ref": "#/entities/Category" },
+      "description": "Public storefront playpen collections."
+    },
+    "/products/{productId}": {
+      "schema": { "$ref": "#/entities/Product" },
+      "description": "Public storefront baby playpen catalog."
+    },
+    "/productSizes/{sizeId}": {
+      "schema": { "$ref": "#/entities/ProductSize" },
+      "description": "Playpen structural footprint options."
+    },
+    "/productColors/{colorId}": {
+      "schema": { "$ref": "#/entities/ProductColor" },
+      "description": "Playpen finish and upholstery colorways."
+    },
+    "/inventory/{inventoryId}": {
+      "schema": { "$ref": "#/entities/Inventory" },
+      "description": "Live inventory counts per playpen configuration variant."
+    },
+    "/customerAddresses/{addressId}": {
+      "schema": { "$ref": "#/entities/CustomerAddress" },
+      "description": "Saved UAE delivery addresses scoped per customer."
+    },
+    "/orders/{orderId}": {
+      "schema": { "$ref": "#/entities/Order" },
+      "description": "Customer orders scoped strictly to their owner userId or Admin."
+    },
+    "/orderItems/{orderItemId}": {
+      "schema": { "$ref": "#/entities/OrderItem" },
+      "description": "Line items attached to a customer order."
+    },
+    "/orderTrackingHistory/{eventId}": {
+      "schema": { "$ref": "#/entities/OrderTrackingHistory" },
+      "description": "Fulfillment and courier tracking events per order."
+    },
+    "/storeSettings/{settingId}": {
+      "schema": { "$ref": "#/entities/StoreSettings" },
+      "description": "Admin-managed UAE white-glove delivery configuration."
+    },
+    "/admins/{adminId}": {
+      "schema": { "$ref": "#/entities/Admin" },
+      "description": "Trusted PLAYPEN administrator accounts."
+    }
+  }
+}

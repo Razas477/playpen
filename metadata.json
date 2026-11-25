@@ -1,0 +1,6 @@
+{
+  "name": "PLAYPEN — Luxury Baby Playpens UAE",
+  "description": "Dedicated UAE luxury baby playpen specialist crafting wooden, foldable, breathable mesh, large architectural, modular, travel, and signature playpens in AED.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
