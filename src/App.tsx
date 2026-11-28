@@ -288,7 +288,11 @@ export default function App() {
         setActiveRoute('admin');
       }
 
-      await ensureUserProfile(user, wishlistRef.current);
+      try {
+        await ensureUserProfile(user, wishlistRef.current);
+      } catch (err) {
+        console.error('Profile sync failed:', err);
+      }
       if (mySession !== activeSessionId) return;
 
       const verifiedAdmin = await verifyAdminAccessOnServer(user);
