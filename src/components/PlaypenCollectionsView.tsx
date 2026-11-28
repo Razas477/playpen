@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { ArrowRight, Maximize2, ShieldCheck, Layers } from 'lucide-react';
+import { formatAed } from '../data/catalog';
 import { PLAYPEN_CHAPTERS } from '../data/playpenCollections';
 import { PageRoute, PlaypenCollectionChapter, Product, ProductCategory } from '../types/store';
 import { ResilientImage } from './ResilientImage';
@@ -88,14 +89,14 @@ export function PlaypenCollectionsView({
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-5 sm:gap-6 pb-6 sm:pb-8 border-b border-[#142220]/12">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[#2B5B51]">
-              Playpen Lookbook · 8 Collections
+              Playpen Lookbook · 4 Collections
             </p>
             <h2 className="font-serif font-bold text-2xl sm:text-4xl lg:text-[42px] mt-1.5 leading-tight text-[#142220]">
               Explore Our Playpen Collections
             </h2>
           </div>
 
-          {/* 8 Collection Filter Tabs */}
+          {/* 4 Collection Filter Tabs */}
           <div className="flex items-center gap-2 overflow-x-auto no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0 pb-1">
             {PLAYPEN_CHAPTERS.map((chap, idx) => {
               const active = idx === activeIndex;
@@ -141,7 +142,7 @@ export function PlaypenCollectionsView({
                   }`}
                 >
                   <div
-                    className="group relative aspect-[4/3] sm:aspect-[16/11] rounded-[20px] sm:rounded-[28px] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.12)] lg:shadow-[0_32px_70px_rgba(0,0,0,0.15)] transition-transform duration-700 lg:hover:scale-[1.01]"
+                    className="group relative aspect-[4/3] rounded-[20px] sm:rounded-[28px] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.12)] lg:shadow-[0_32px_70px_rgba(0,0,0,0.15)] transition-transform duration-700 lg:hover:scale-[1.01]"
                     style={{ backgroundColor: chapter.surfaceColor }}
                   >
                     <ResilientImage
@@ -204,14 +205,16 @@ export function PlaypenCollectionsView({
                         isDark ? 'text-[#F1F3EF]' : 'text-[#142220]'
                       }`}
                     >
-                      AED {(matchedProduct?.priceAed ?? chapter.priceAed).toLocaleString()}
+                      {matchedProduct?.priceRangeMaxAed
+                        ? `${formatAed(matchedProduct.priceAed)} – ${formatAed(matchedProduct.priceRangeMaxAed)}`
+                        : formatAed(matchedProduct?.priceAed ?? chapter.priceAed)}
                     </span>
                     <span
                       className={`text-xs font-medium ${
                         isDark ? 'text-[#C6D2CD]' : 'text-[#4A5B57]'
                       }`}
                     >
-                      Free UAE Delivery Over AED 750
+                      Cash on Delivery · Free UAE Delivery Over AED 750
                     </span>
                   </div>
 

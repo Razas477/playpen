@@ -53,7 +53,7 @@ export function FloatingCategoryPanel({
                       : 'hover:bg-[#E6EAE4] text-[#142220]'
                   }`}
                 >
-                  <div className="w-11 h-9 rounded-lg overflow-hidden bg-[#DCE2DA] shrink-0">
+                  <div className="w-12 h-9 rounded-lg overflow-hidden bg-[#DCE2DA] shrink-0">
                     <ResilientImage
                       src={cat.image}
                       alt={cat.label}

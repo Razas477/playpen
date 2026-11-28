@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { X, Maximize2, ShieldCheck, ArrowRight, Heart } from 'lucide-react';
+import { X, Maximize2, ShieldCheck, ArrowRight, Heart, Star } from 'lucide-react';
+import { formatAed, getProductUnitPrice } from '../data/catalog';
 import { Product } from '../types/store';
 import { ResilientImage } from './ResilientImage';
 
@@ -21,20 +22,21 @@ export function QuickViewModal({
   onToggleWishlist,
 }: QuickViewModalProps) {
   const [selectedConfig, setSelectedConfig] = useState(
-    product?.sizes[0] || 'Standard Frame'
+    product?.sizes[0] || '120cm x 120cm'
   );
   const [selectedColor, setSelectedColor] = useState(
-    product?.colors[0]?.name || 'Warm Beech'
+    product?.colors[0]?.name || 'Classic'
   );
 
   if (!product) return null;
 
   const activeConfig = product.sizes.includes(selectedConfig)
     ? selectedConfig
-    : product.sizes[0] || 'Standard Frame';
+    : product.sizes[0] || '120cm x 120cm';
   const activeColor = product.colors.some((c) => c.name === selectedColor)
     ? selectedColor
-    : product.colors[0]?.name || 'Warm Beech';
+    : product.colors[0]?.name || 'Classic';
+  const activePrice = getProductUnitPrice(product, activeConfig);
 
   return (
     <div className="fixed inset-0 z-50 bg-[#142220]/55 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
@@ -47,7 +49,7 @@ export function QuickViewModal({
           <X className="w-4 h-4" />
         </button>
 
-        <div className="md:col-span-6 bg-[#E6EAE4] aspect-[4/3] md:aspect-auto">
+        <div className="md:col-span-6 bg-[#E6EAE4] aspect-[4/3] md:my-auto md:rounded-l-[24px] overflow-hidden">
           <ResilientImage
             src={product.image}
             alt={product.name}
@@ -58,15 +60,30 @@ export function QuickViewModal({
 
         <div className="md:col-span-6 p-5 sm:p-7 flex flex-col justify-between gap-5">
           <div className="space-y-3">
-            <p className="text-xs font-semibold text-[#2B5B51]">
-              {product.categoryLabel}
-            </p>
-            <h2 className="font-serif font-bold text-2xl text-[#142220] leading-snug pr-8 md:pr-0">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-xs font-semibold text-[#2B5B51]">
+                {product.categoryLabel}
+              </p>
+              {product.rating && (
+                <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#142220]">
+                  <Star className="w-3.5 h-3.5 fill-[#C69E73] text-[#C69E73]" />
+                  {product.rating.toFixed(1)} ({product.reviewCount ?? 5})
+                </span>
+              )}
+            </div>
+            <h2 className="font-serif font-bold text-xl sm:text-2xl text-[#142220] leading-snug pr-8 md:pr-0">
               {product.name}
             </h2>
-            <p className="font-serif font-bold text-xl text-[#142220] tabular-nums">
-              AED {product.priceAed.toLocaleString()}
-            </p>
+            <div className="flex flex-wrap items-baseline gap-2">
+              {product.originalPriceAed && product.originalPriceAed > activePrice && (
+                <span className="text-sm text-[#647370] line-through tabular-nums">
+                  {formatAed(product.originalPriceAed)}
+                </span>
+              )}
+              <p className="font-serif font-bold text-xl text-[#142220] tabular-nums">
+                {formatAed(activePrice)}
+              </p>
+            </div>
             <p className="text-sm text-[#3C4B48] leading-relaxed line-clamp-3">
               {product.description}
             </p>

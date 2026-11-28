@@ -60,8 +60,8 @@ const CART_STORAGE_KEY = 'playpen_cart_v1';
 
 function loadInitialCart(): CartItem[] {
   const starterProduct = PRODUCTS[0];
-  const starterSize = starterProduct.sizes[0] || '150 × 150 cm (Standard)';
-  const starterColor = starterProduct.colors[0]?.name || 'Warm Honey Beech';
+  const starterSize = starterProduct.sizes[0] || '120 × 120 × 1 cm';
+  const starterColor = starterProduct.colors[0]?.name || 'Reversible Road & Bear Print';
   const defaultBag: CartItem[] = [
     {
       id: `${starterProduct.id}-${starterSize}-${starterColor}`,
@@ -84,13 +84,13 @@ function loadInitialCart(): CartItem[] {
         valid.push({
           id: String(entry.id || `${product.id}-${entry.size}-${entry.color}`),
           product,
-          size: String(entry.size || product.sizes[0] || 'Standard Frame'),
-          color: String(entry.color || product.colors[0]?.name || 'Warm Beech'),
+          size: String(entry.size || product.sizes[0] || '120cm x 120cm'),
+          color: String(entry.color || product.colors[0]?.name || 'Classic'),
           quantity: Math.min(20, Math.max(1, Math.floor(entry.quantity))),
         });
       }
     }
-    return valid;
+    return valid.length > 0 ? valid : defaultBag;
   } catch {
     return defaultBag;
   }
@@ -125,8 +125,8 @@ export default function App() {
   const toastTimerRef = useRef<number | null>(null);
 
   const [wishlist, setWishlist] = useState<string[]>([
-    'al-saadiyat-beechwood-square',
-    'palm-atelier-modular-compound',
+    'versatile-foldable-baby-play-mat-120x120',
+    'baby-playpen-extra-large-gate-120x120',
   ]);
   const wishlistRef = useRef<string[]>(wishlist);
   wishlistRef.current = wishlist;
@@ -429,8 +429,8 @@ export default function App() {
       size ||
       product.sizes.find((s) => !unavailable.has(s)) ||
       product.sizes[0] ||
-      'Standard Frame';
-    const chosenColor = color || product.colors[0]?.name || 'Warm Beech';
+      '120cm x 120cm';
+    const chosenColor = color || product.colors[0]?.name || 'Classic';
     handleAddToCart(product, chosenSize, chosenColor, 1, false);
   };
 
@@ -645,6 +645,7 @@ export default function App() {
               transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
             >
               <ProductDetailView
+                key={selectedProduct.id}
                 product={selectedProduct}
                 relatedProducts={relatedProducts}
                 onBack={() => setSelectedProduct(null)}

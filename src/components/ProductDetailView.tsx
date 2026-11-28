@@ -13,7 +13,9 @@ import {
   Weight,
   ZoomIn,
   ArrowRight,
+  Star,
 } from 'lucide-react';
+import { formatAed, getProductUnitPrice } from '../data/catalog';
 import { PageRoute, Product } from '../types/store';
 import { ProductCard } from './ProductCard';
 import { ResilientImage } from './ResilientImage';
@@ -49,14 +51,16 @@ export function ProductDetailView({
 
   const [selectedImageIdx, setSelectedImageIdx] = useState(0);
   const [selectedConfig, setSelectedConfig] = useState(
-    product.sizes[0] || 'Standard Frame'
+    product.sizes[0] || '120cm x 120cm'
   );
   const [selectedColor, setSelectedColor] = useState(
-    product.colors[0]?.name || 'Warm Natural Beech'
+    product.colors[0]?.name || 'Classic'
   );
   const [quantity, setQuantity] = useState(1);
   const [zoomed, setZoomed] = useState(false);
   const [justAdded, setJustAdded] = useState(false);
+
+  const unitPriceAed = getProductUnitPrice(product, selectedConfig);
 
   const mobileCarouselRef = useRef<HTMLDivElement | null>(null);
   const activePhoto = gallery[selectedImageIdx] || gallery[0];
@@ -284,13 +288,34 @@ export function ProductDetailView({
               </p>
 
               <div className="mt-3.5 sm:mt-4 flex flex-wrap items-baseline gap-2.5 sm:gap-3">
+                {product.originalPriceAed && product.originalPriceAed > unitPriceAed && (
+                  <span className="text-base sm:text-lg text-[#647370] line-through tabular-nums">
+                    {formatAed(product.originalPriceAed)}
+                  </span>
+                )}
                 <span className="font-serif font-bold text-2xl sm:text-3xl text-[#142220] tabular-nums">
-                  AED {product.priceAed.toLocaleString()}
+                  {formatAed(unitPriceAed)}
                 </span>
                 <span className="text-xs font-medium text-[#4A5B57]">
                   Includes VAT · Cash on Delivery available
                 </span>
               </div>
+
+              {product.rating && (
+                <div className="mt-2.5 inline-flex items-center gap-2 text-xs sm:text-sm font-medium text-[#2B5B51]">
+                  <div className="flex items-center gap-0.5 text-[#C69E73]">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <Star key={i} className="w-3.5 h-3.5 fill-current" />
+                    ))}
+                  </div>
+                  <span className="font-semibold text-[#142220]">
+                    {product.rating.toFixed(2)} out of 5
+                  </span>
+                  <span className="text-[#4A5B57]">
+                    ({product.reviewCount ?? 5} customer reviews)
+                  </span>
+                </div>
+              )}
             </div>
 
             <p className="text-[15px] text-[#1F3532] leading-relaxed">
@@ -352,12 +377,13 @@ export function ProductDetailView({
                   {product.sizes.map((cfg) => {
                     const active = cfg === selectedConfig;
                     const soldOut = product.unavailableSizes?.includes(cfg);
+                    const sizePrice = product.sizePricesAed?.[cfg];
                     return (
                       <button
                         key={cfg}
                         disabled={soldOut}
                         onClick={() => setSelectedConfig(cfg)}
-                        className={`min-h-[44px] px-4 py-3 rounded-xl border text-left text-xs sm:text-[13px] transition-all cursor-pointer ${
+                        className={`min-h-[44px] px-4 py-3 rounded-xl border text-left text-xs sm:text-[13px] transition-all cursor-pointer flex items-center justify-between gap-2 ${
                           soldOut
                             ? 'opacity-45 line-through cursor-not-allowed border-[#142220]/10'
                             : active
@@ -365,7 +391,12 @@ export function ProductDetailView({
                             : 'border-[#142220]/18 text-[#142220] font-medium hover:border-[#142220]'
                         }`}
                       >
-                        {cfg}
+                        <span>{cfg}</span>
+                        {typeof sizePrice === 'number' && (
+                          <span className="tabular-nums opacity-90">
+                            {formatAed(sizePrice)}
+                          </span>
+                        )}
                       </button>
                     );
                   })}
@@ -407,7 +438,7 @@ export function ProductDetailView({
                       Added to Cart
                     </>
                   ) : (
-                    <>Add to Cart · AED {(product.priceAed * quantity).toLocaleString()}</>
+                    <>Add to Cart · {formatAed(unitPriceAed * quantity)}</>
                   )}
                 </button>
 
@@ -574,7 +605,7 @@ export function ProductDetailView({
         <div className="max-w-xl mx-auto flex items-center justify-between gap-3">
           <div className="min-w-0">
             <p className="font-serif font-bold text-lg sm:text-xl text-[#142220] tabular-nums leading-tight">
-              AED {(product.priceAed * quantity).toLocaleString()}
+              {formatAed(unitPriceAed * quantity)}
             </p>
             <p className="text-xs text-[#4A5B57] font-medium truncate">
               {selectedConfig.split('(')[0].trim()} · Qty {quantity}

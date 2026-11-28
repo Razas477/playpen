@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Lock, Minus, Plus, ShoppingBag, Trash2, X } from 'lucide-react';
 import { User } from 'firebase/auth';
 import { AnimatePresence, motion } from 'motion/react';
+import { formatAed, getProductUnitPrice, roundCurrency } from '../data/catalog';
 import { computeDeliveryFee } from '../lib/storeDb';
 import { CartItem, StoreSettings } from '../types/store';
 import { ResilientImage } from './ResilientImage';
@@ -27,14 +28,17 @@ export function CartDrawer({
   storeSettings,
   onProceedToCheckout,
 }: CartDrawerProps) {
-  const subtotal = items.reduce(
-    (sum, item) => sum + item.product.priceAed * item.quantity,
-    0
+  const subtotal = roundCurrency(
+    items.reduce(
+      (sum, item) =>
+        sum + roundCurrency(getProductUnitPrice(item.product, item.size) * item.quantity),
+      0
+    )
   );
   const freeShippingThreshold = storeSettings?.freeShippingThresholdAed ?? 750;
-  const shippingFee = computeDeliveryFee(subtotal, storeSettings);
-  const total = subtotal + shippingFee;
-  const remainingForFree = Math.max(0, freeShippingThreshold - subtotal);
+  const shippingFee = roundCurrency(computeDeliveryFee(subtotal, storeSettings));
+  const total = roundCurrency(subtotal + shippingFee);
+  const remainingForFree = roundCurrency(Math.max(0, freeShippingThreshold - subtotal));
 
   useEffect(() => {
     if (!isOpen) return;
@@ -98,8 +102,8 @@ export function CartDrawer({
                     Your Cart is Empty
                   </h3>
                   <p className="mt-2 text-sm text-[#4A5B57] max-w-xs mx-auto leading-relaxed">
-                    Browse our wooden, foldable, breathable mesh, and modular playpens to find the
-                    right fit for your home.
+                    Browse our mesh playpens, gate activity yards, foldable play mats, and ocean
+                    balls to find the right fit for your home.
                   </p>
                   <button
                     type="button"
@@ -119,7 +123,7 @@ export function CartDrawer({
                       </span>
                     ) : (
                       <span>
-                        Add <strong className="text-[#142220] tabular-nums">AED {remainingForFree}</strong> more for free UAE delivery.
+                        Add <strong className="text-[#142220] tabular-nums">{formatAed(remainingForFree)}</strong> more for free UAE delivery.
                       </span>
                     )}
                     <div className="mt-2 h-1.5 w-full rounded-full bg-[#D7DDD5] overflow-hidden">
@@ -147,7 +151,7 @@ export function CartDrawer({
                           <ResilientImage
                             src={item.product.image}
                             alt={item.product.name}
-                            className="w-20 h-20 rounded-xl object-cover bg-[#E6EAE4] shrink-0"
+                            className="w-20 h-[60px] rounded-xl object-cover bg-[#E6EAE4] shrink-0"
                           />
                           <div className="flex-1 min-w-0">
                             <div className="flex items-start justify-between gap-2">
@@ -189,7 +193,9 @@ export function CartDrawer({
                                 </button>
                               </div>
                               <span className="text-sm font-bold text-[#142220] tabular-nums">
-                                AED {(item.product.priceAed * item.quantity).toLocaleString()}
+                                {formatAed(
+                                  getProductUnitPrice(item.product, item.size) * item.quantity
+                                )}
                               </span>
                             </div>
                           </div>
@@ -208,18 +214,18 @@ export function CartDrawer({
                   <div className="flex justify-between">
                     <span>Subtotal</span>
                     <span className="tabular-nums font-semibold text-[#142220]">
-                      AED {subtotal.toLocaleString()}
+                      {formatAed(subtotal)}
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span>UAE Delivery</span>
                     <span className="tabular-nums font-semibold text-[#142220]">
-                      {shippingFee === 0 ? 'Free' : `AED ${shippingFee}`}
+                      {shippingFee === 0 ? 'Free' : formatAed(shippingFee)}
                     </span>
                   </div>
                   <div className="pt-2 border-t border-[#142220]/10 flex justify-between text-base font-bold text-[#142220]">
                     <span>Total (Includes VAT)</span>
-                    <span className="tabular-nums">AED {total.toLocaleString()}</span>
+                    <span className="tabular-nums">{formatAed(total)}</span>
                   </div>
                 </div>
 

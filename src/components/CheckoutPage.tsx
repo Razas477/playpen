@@ -10,6 +10,7 @@ import {
   Truck,
 } from 'lucide-react';
 import { User } from 'firebase/auth';
+import { formatAed, getProductUnitPrice, roundCurrency } from '../data/catalog';
 import {
   computeDeliveryFee,
   getEstimatedDeliveryWindow,
@@ -117,12 +118,15 @@ export function CheckoutPage({
     setSaveAddressToProfile(false);
   };
 
-  const subtotalAed = items.reduce(
-    (sum, item) => sum + item.product.priceAed * item.quantity,
-    0
+  const subtotalAed = roundCurrency(
+    items.reduce(
+      (sum, item) =>
+        sum + roundCurrency(getProductUnitPrice(item.product, item.size) * item.quantity),
+      0
+    )
   );
-  const deliveryFeeAed = computeDeliveryFee(subtotalAed, storeSettings);
-  const totalAed = subtotalAed + deliveryFeeAed;
+  const deliveryFeeAed = roundCurrency(computeDeliveryFee(subtotalAed, storeSettings));
+  const totalAed = roundCurrency(subtotalAed + deliveryFeeAed);
   const estimatedWindow = getEstimatedDeliveryWindow(emirate);
 
   if (!user) {
@@ -177,7 +181,8 @@ export function CheckoutPage({
               Your Cart is Empty
             </h1>
             <p className="text-sm text-[#3C4B48]">
-              Add a wooden, foldable, mesh, modular, or travel playpen to your cart before checking out.
+              Add a mesh playpen, gate activity yard, foldable play mat, or ocean ball set to your
+              cart before checking out.
             </p>
             <button
               type="button"
@@ -270,11 +275,13 @@ export function CheckoutPage({
               {items.reduce((s, i) => s + i.quantity, 0)} Items · {emirate}
             </p>
             <p className="text-xs font-semibold text-[#142220] truncate">
-              {deliveryFeeAed === 0 ? 'Free UAE Delivery' : `Includes AED ${deliveryFeeAed} delivery`}
+              {deliveryFeeAed === 0
+                ? 'Free UAE Delivery'
+                : `Includes ${formatAed(deliveryFeeAed)} delivery`}
             </p>
           </div>
           <span className="font-serif text-lg font-bold text-[#142220] tabular-nums shrink-0">
-            AED {totalAed.toLocaleString()}
+            {formatAed(totalAed)}
           </span>
         </div>
 
@@ -537,45 +544,49 @@ export function CheckoutPage({
               </div>
 
               <div className="divide-y divide-[#142220]/10 max-h-[340px] overflow-y-auto pr-1">
-                {items.map((item) => (
-                  <div key={item.id} className="py-3.5 flex gap-3.5">
-                    <ResilientImage
-                      src={item.product.image}
-                      alt={item.product.name}
-                      className="w-16 h-16 rounded-xl object-cover bg-[#D7DDD5] shrink-0"
-                    />
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-semibold text-[#142220] truncate">
-                        {item.product.name}
-                      </p>
-                      <p className="mt-0.5 text-xs text-[#4A5B57]">
-                        Size: <strong className="font-semibold text-[#142220]">{item.size}</strong> · Color:{' '}
-                        <strong className="font-semibold text-[#142220]">{item.color}</strong>
-                      </p>
-                      <div className="mt-1.5 flex items-center justify-between text-xs">
-                        <span className="text-[#4A5B57] tabular-nums">
-                          Qty {item.quantity} × AED {item.product.priceAed.toLocaleString()}
-                        </span>
-                        <span className="font-bold text-[#142220] tabular-nums">
-                          AED {(item.product.priceAed * item.quantity).toLocaleString()}
-                        </span>
+                {items.map((item) => {
+                  const itemUnit = getProductUnitPrice(item.product, item.size);
+                  const itemLine = roundCurrency(itemUnit * item.quantity);
+                  return (
+                    <div key={item.id} className="py-3.5 flex gap-3.5">
+                      <ResilientImage
+                        src={item.product.image}
+                        alt={item.product.name}
+                        className="w-16 h-12 rounded-xl object-cover bg-[#D7DDD5] shrink-0"
+                      />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-semibold text-[#142220] truncate">
+                          {item.product.name}
+                        </p>
+                        <p className="mt-0.5 text-xs text-[#4A5B57]">
+                          Size: <strong className="font-semibold text-[#142220]">{item.size}</strong> · Color:{' '}
+                          <strong className="font-semibold text-[#142220]">{item.color}</strong>
+                        </p>
+                        <div className="mt-1.5 flex items-center justify-between text-xs">
+                          <span className="text-[#4A5B57] tabular-nums">
+                            Qty {item.quantity} × {formatAed(itemUnit)}
+                          </span>
+                          <span className="font-bold text-[#142220] tabular-nums">
+                            {formatAed(itemLine)}
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
               <div className="pt-4 border-t border-[#142220]/10 space-y-2.5 text-xs sm:text-sm text-[#3C4B48]">
                 <div className="flex justify-between">
                   <span>Subtotal</span>
                   <span className="font-semibold text-[#142220] tabular-nums">
-                    AED {subtotalAed.toLocaleString()}
+                    {formatAed(subtotalAed)}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span>UAE Delivery</span>
                   <span className="font-semibold text-[#142220] tabular-nums">
-                    {deliveryFeeAed === 0 ? 'Free' : `AED ${deliveryFeeAed}`}
+                    {deliveryFeeAed === 0 ? 'Free' : formatAed(deliveryFeeAed)}
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-xs text-[#4A5B57]">
@@ -587,7 +598,7 @@ export function CheckoutPage({
                 </div>
                 <div className="pt-3 border-t border-[#142220]/10 flex justify-between text-base font-bold text-[#142220]">
                   <span>Total (Includes VAT)</span>
-                  <span className="tabular-nums">AED {totalAed.toLocaleString()}</span>
+                  <span className="tabular-nums">{formatAed(totalAed)}</span>
                 </div>
               </div>
 
@@ -599,7 +610,7 @@ export function CheckoutPage({
               >
                 {isSubmitting
                   ? 'Placing Your Order...'
-                  : `Place Order (Cash on Delivery) · AED ${totalAed.toLocaleString()}`}
+                  : `Place Order (Cash on Delivery) · ${formatAed(totalAed)}`}
               </button>
 
               <p className="text-xs text-center text-[#4A5B57]">

@@ -23,14 +23,10 @@ interface CategoryViewsProps {
 }
 
 const COLLECTION_ROUTES: ProductCategory[] = [
-  'wooden',
-  'foldable',
   'mesh',
   'large',
-  'modular',
-  'travel',
-  'premium',
-  'signature',
+  'foldable',
+  'balls',
 ];
 
 export function CategoryViews({
@@ -67,17 +63,16 @@ export function CategoryViews({
   }, [products]);
 
   const materialOptions: MaterialGroup[] = [
-    'Solid Beechwood',
-    'Breathable Mesh',
-    'Architectural HDPE',
-    'Anodized Aluminum & Linen',
+    'Breathable Mesh & Cationic',
+    'HDPE Activity Fence',
+    'Waterproof XPE Foam',
+    'BPA-Free PE Plastic',
   ];
 
   const dimensionOptions: DimensionsGroup[] = [
     'Compact',
     'Standard',
     'Large',
-    'Extra Large',
   ];
 
   const filteredProducts = useMemo(() => {
@@ -87,12 +82,12 @@ export function CategoryViews({
       list = list.filter((p) => p.category === selectedCategory);
     }
 
-    if (selectedPriceRange === 'under-1500') {
-      list = list.filter((p) => p.priceAed < 1500);
-    } else if (selectedPriceRange === '1500-2600') {
-      list = list.filter((p) => p.priceAed >= 1500 && p.priceAed <= 2600);
-    } else if (selectedPriceRange === 'over-2600') {
-      list = list.filter((p) => p.priceAed > 2600);
+    if (selectedPriceRange === 'under-150') {
+      list = list.filter((p) => p.priceAed < 150);
+    } else if (selectedPriceRange === '150-300') {
+      list = list.filter((p) => p.priceAed >= 150 && p.priceAed <= 300);
+    } else if (selectedPriceRange === 'over-300') {
+      list = list.filter((p) => p.priceAed > 300);
     }
 
     if (selectedColor !== 'all') {
@@ -230,11 +225,11 @@ export function CategoryViews({
               PLAYPEN Store · UAE (AED)
             </p>
             <h1 className="font-serif font-bold text-3xl sm:text-[42px] text-[#142220] mt-1.5">
-              Shop Baby Playpens
+              Shop Playpens, Mats &amp; Balls
             </h1>
             <p className="text-[15px] text-[#3C4B48] mt-2 max-w-2xl leading-relaxed">
-              Browse all wooden, foldable, mesh, large, modular, and travel playpens. Filter by size,
-              material, or price to find the right fit for your home.
+              Browse our breathable mesh playpens, gate activity fences, waterproof foldable play
+              mats, and soft ocean balls. Filter by size, material, or price.
             </p>
           </div>
 
@@ -350,9 +345,9 @@ export function CategoryViews({
                   className="w-full rounded-xl bg-white border border-[#142220]/15 px-3 min-h-[44px] py-2.5 text-base sm:text-xs font-medium text-[#142220]"
                 >
                   <option value="all">Any Price</option>
-                  <option value="under-1500">Under AED 1,500</option>
-                  <option value="1500-2600">AED 1,500 – AED 2,600</option>
-                  <option value="over-2600">Above AED 2,600</option>
+                  <option value="under-150">Under AED 150</option>
+                  <option value="150-300">AED 150 – AED 300</option>
+                  <option value="over-300">Above AED 300</option>
                 </select>
               </div>
 
@@ -435,7 +430,8 @@ export function CategoryViews({
               No playpens match these filters
             </p>
             <p className="text-sm text-[#4A5B57]">
-              Try clearing a filter to see all available wooden, foldable, mesh, and travel playpens.
+              Try clearing a filter to see all available mesh playpens, activity fences, play mats,
+              and ocean ball sets.
             </p>
             <button
               onClick={resetFilters}

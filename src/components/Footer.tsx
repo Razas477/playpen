@@ -29,8 +29,8 @@ export function Footer({
               </p>
             </div>
             <p className="text-sm text-[#DCE2DA] leading-relaxed max-w-sm">
-              Safe, stylish baby playpens made from solid wood, soft fabric, and breathable mesh for
-              modern UAE homes.
+              Safe, breathable mesh playpens, HDPE activity fences, waterproof folding play mats,
+              and non-toxic ocean balls for modern UAE homes.
             </p>
             <div className="pt-2 text-xs text-[#B4C2BC] space-y-1">
               <p>Showroom: Dubai Design District (d3), Building 7</p>
@@ -38,22 +38,18 @@ export function Footer({
             </div>
           </div>
 
-          {/* 8 Playpen Collections */}
+          {/* 4 Playpen Collections */}
           <div className="lg:col-span-4 space-y-3">
             <h3 className="text-xs font-semibold uppercase tracking-[0.08em] text-[#C6D2CD]">
               Collections
             </h3>
-            <div className="grid grid-cols-1 min-[360px]:grid-cols-2 gap-y-1 sm:gap-y-1.5 gap-x-6 text-sm text-[#DCE2DA]">
+            <div className="grid grid-cols-1 gap-y-1 sm:gap-y-1.5 text-sm text-[#DCE2DA]">
               {(
                 [
-                  ['wooden', 'Wooden Playpens'],
-                  ['foldable', 'Foldable Playpens'],
                   ['mesh', 'Mesh Playpens'],
-                  ['large', 'Large Playpens'],
-                  ['modular', 'Modular Playpens'],
-                  ['travel', 'Travel Playpens'],
-                  ['premium', 'Premium Playpens'],
-                  ['signature', 'Signature Collection'],
+                  ['large', 'Gate & Activity Playpens'],
+                  ['foldable', 'Foldable Play Mats'],
+                  ['balls', 'Ocean Ball Sets'],
                 ] as Array<[PageRoute, string]>
               ).map(([route, label]) => (
                 <button

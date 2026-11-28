@@ -22,26 +22,24 @@ interface AdminProductModalProps {
 }
 
 const FOOTPRINT_PRESETS = [
-  '140 × 120 cm (Compact)',
-  '150 × 150 cm (Standard)',
-  '180 × 150 cm (Standard)',
-  '200 × 180 cm (Villa XL)',
-  '240 × 200 cm (Grand)',
-  '18-Panel Modular Estate',
+  '120cm x 120cm',
+  '150cm x 180cm',
+  '120 × 120 × 1 cm',
+  '150 × 180 cm (1.3 cm Thick)',
+  '5.5cm',
 ];
 
 const DIMENSIONS_GROUPS: DimensionsGroup[] = [
   'Compact',
   'Standard',
   'Large',
-  'Extra Large',
 ];
 
 const MATERIAL_GROUPS: MaterialGroup[] = [
-  'Solid Beechwood',
-  'Breathable Mesh',
-  'Architectural HDPE',
-  'Anodized Aluminum & Linen',
+  'Breathable Mesh & Cationic',
+  'HDPE Activity Fence',
+  'Waterproof XPE Foam',
+  'BPA-Free PE Plastic',
 ];
 
 async function compressImageFileToDataUrl(file: File): Promise<string> {
@@ -101,40 +99,44 @@ export function AdminProductModal({
 }: AdminProductModalProps) {
   const [name, setName] = useState('');
   const [subtitle, setSubtitle] = useState('');
-  const [category, setCategory] = useState<ProductCategory>('wooden');
-  const [priceAed, setPriceAed] = useState('2150');
-  const [image, setImage] = useState<string>(PLAYPEN_IMAGES.woodenSquare);
-  const [dimensions, setDimensions] = useState('150 × 150 × 74 cm');
+  const [category, setCategory] = useState<ProductCategory>('mesh');
+  const [priceAed, setPriceAed] = useState('149');
+  const [image, setImage] = useState<string>(PLAYPEN_IMAGES.p6_1);
+  const [dimensions, setDimensions] = useState('120 × 120 × 65 cm');
   const [dimensionsGroup, setDimensionsGroup] = useState<DimensionsGroup>('Standard');
-  const [material, setMaterial] = useState('Kiln-Dried European Beechwood & Organic Linen Pad');
-  const [materialGroup, setMaterialGroup] = useState<MaterialGroup>('Solid Beechwood');
-  const [weightCapacity, setWeightCapacity] = useState('35 kg Certified Frame');
-  const [ageSuitability, setAgeSuitability] = useState('0 – 36 Months');
+  const [material, setMaterial] = useState(
+    'Cationic Fabric, Bumper Foam Padding & Breathable Mesh'
+  );
+  const [materialGroup, setMaterialGroup] = useState<MaterialGroup>(
+    'Breathable Mesh & Cationic'
+  );
+  const [weightCapacity, setWeightCapacity] = useState('Up to 35 kg');
+  const [ageSuitability, setAgeSuitability] = useState('0 – 48 Months');
   const [safetySpecsText, setSafetySpecsText] = useState(
-    'EN 12227:2010 & ASTM F406 Safety Certified\nZero-VOC water-based matte lacquer\nDual-action adult safety latch'
+    '360-degree breathable mesh walls keep airflow fresh and baby in clear view\nSoft bumper-foam padding wraps top rails to soften bumps\nExternal zippered crawl door keeps toddlers safely inside'
   );
   const [foldingAndStorage, setFoldingAndStorage] = useState(
-    'Tool-free concealed corner locks unclip in under 90 seconds for slim flat storage.'
+    'Disassembles without tools and packs cleanly into the included zippered carry bag.'
   );
   const [deliveryInfo, setDeliveryInfo] = useState(
-    'Complimentary white-glove UAE courier delivery across all 7 Emirates.'
+    'Fast UAE courier delivery across all 7 Emirates with Cash on Delivery.'
   );
   const [careNote, setCareNote] = useState(
-    'Wipe solid frame with damp cotton cloth; gentle cold wash for linen pads.'
+    'Wipe fabric and breathable mesh sides with a damp cloth and mild soap.'
   );
   const [originNote, setOriginNote] = useState(
-    'Engineered for sunlit UAE villa interiors.'
+    'Compact footprint suitable for apartments, living rooms, and patios.'
   );
   const [description, setDescription] = useState('');
   const [featuredTag, setFeaturedTag] = useState('');
-  const [sizes, setSizes] = useState<string[]>(['150 × 150 cm (Standard)', '180 × 150 cm (Standard)']);
+  const [sizes, setSizes] = useState<string[]>(['120cm x 120cm']);
   const [unavailableSizes, setUnavailableSizes] = useState<string[]>([]);
   const [customSize, setCustomSize] = useState('');
   const [colors, setColors] = useState<ProductColorOption[]>([
-    { name: 'Warm Honey Beech', hex: '#C69E73' },
+    { name: 'Soft Dove Grey', hex: '#B3B7BC' },
   ]);
   const [newColorName, setNewColorName] = useState('');
-  const [newColorHex, setNewColorHex] = useState('#C69E73');
+  const [newColorHex, setNewColorHex] = useState('#B3B7BC');
   const [initialStock, setInitialStock] = useState('16');
   const [inStock, setInStock] = useState(true);
   const [isFeatured, setIsFeatured] = useState(false);
@@ -154,12 +156,12 @@ export function AdminProductModal({
       setCategory(editingProduct.category);
       setPriceAed(String(editingProduct.priceAed));
       setImage(editingProduct.image);
-      setDimensions(editingProduct.dimensions || '180 × 150 × 68 cm');
+      setDimensions(editingProduct.dimensions || '120 × 120 × 65 cm');
       setDimensionsGroup(editingProduct.dimensionsGroup || 'Standard');
       setMaterial(editingProduct.material || '');
-      setMaterialGroup(editingProduct.materialGroup || 'Solid Beechwood');
-      setWeightCapacity(editingProduct.weightCapacity || '35 kg Certified Frame');
-      setAgeSuitability(editingProduct.ageSuitability || '0 – 36 Months');
+      setMaterialGroup(editingProduct.materialGroup || 'Breathable Mesh & Cationic');
+      setWeightCapacity(editingProduct.weightCapacity || 'Up to 35 kg');
+      setAgeSuitability(editingProduct.ageSuitability || '0 – 48 Months');
       setSafetySpecsText((editingProduct.safetySpecs || []).join('\n'));
       setFoldingAndStorage(editingProduct.foldingAndStorage || '');
       setDeliveryInfo(editingProduct.deliveryInfo || '');
@@ -170,13 +172,13 @@ export function AdminProductModal({
       setSizes(
         editingProduct.sizes.length > 0
           ? editingProduct.sizes
-          : ['180 × 150 cm (Standard)']
+          : ['120cm x 120cm']
       );
       setUnavailableSizes(editingProduct.unavailableSizes || []);
       setColors(
         editingProduct.colors.length > 0
           ? editingProduct.colors
-          : [{ name: 'Warm Honey Beech', hex: '#C69E73' }]
+          : [{ name: 'Soft Dove Grey', hex: '#B3B7BC' }]
       );
       setInStock(editingProduct.inStock !== false);
       setIsFeatured(Boolean(editingProduct.isFeatured ?? editingProduct.featuredTag));
@@ -187,33 +189,33 @@ export function AdminProductModal({
     } else {
       setName('');
       setSubtitle('');
-      setCategory('wooden');
-      setPriceAed('2150');
-      setImage(PLAYPEN_IMAGES.woodenSquare);
-      setDimensions('150 × 150 × 74 cm');
+      setCategory('mesh');
+      setPriceAed('149');
+      setImage(PLAYPEN_IMAGES.p6_1);
+      setDimensions('120 × 120 × 65 cm');
       setDimensionsGroup('Standard');
-      setMaterial('Kiln-Dried European Beechwood & Organic Linen Pad');
-      setMaterialGroup('Solid Beechwood');
-      setWeightCapacity('35 kg Certified Frame');
-      setAgeSuitability('0 – 36 Months');
+      setMaterial('Cationic Fabric, Bumper Foam Padding & Breathable Mesh');
+      setMaterialGroup('Breathable Mesh & Cationic');
+      setWeightCapacity('Up to 35 kg');
+      setAgeSuitability('0 – 48 Months');
       setSafetySpecsText(
-        'EN 12227:2010 & ASTM F406 Safety Certified\nZero-VOC water-based matte lacquer\nDual-action adult safety latch'
+        '360-degree breathable mesh walls keep airflow fresh and baby in clear view\nSoft bumper-foam padding wraps top rails to soften bumps\nExternal zippered crawl door keeps toddlers safely inside'
       );
       setFoldingAndStorage(
-        'Tool-free concealed corner locks unclip in under 90 seconds for slim flat storage.'
+        'Disassembles without tools and packs cleanly into the included zippered carry bag.'
       );
       setDeliveryInfo(
-        'Complimentary white-glove UAE courier delivery across all 7 Emirates.'
+        'Fast UAE courier delivery across all 7 Emirates with Cash on Delivery.'
       );
       setCareNote(
-        'Wipe solid frame with damp cotton cloth; gentle cold wash for linen pads.'
+        'Wipe fabric and breathable mesh sides with a damp cloth and mild soap.'
       );
-      setOriginNote('Engineered for sunlit UAE villa interiors.');
+      setOriginNote('Compact footprint suitable for apartments, living rooms, and patios.');
       setDescription('');
       setFeaturedTag('');
-      setSizes(['150 × 150 cm (Standard)', '180 × 150 cm (Standard)']);
+      setSizes(['120cm x 120cm']);
       setUnavailableSizes([]);
-      setColors([{ name: 'Warm Honey Beech', hex: '#C69E73' }]);
+      setColors([{ name: 'Soft Dove Grey', hex: '#B3B7BC' }]);
       setInStock(true);
       setIsFeatured(false);
       setIsNewArrival(true);
@@ -298,7 +300,7 @@ export function AdminProductModal({
           safetySpecs:
             parsedSafetySpecs.length > 0
               ? parsedSafetySpecs
-              : ['EN 12227:2010 & ASTM F406 Safety Certified'],
+              : ['Breathable mesh sides & baby-safe rounded edges'],
           foldingAndStorage,
           deliveryInfo,
           careNote,
@@ -383,7 +385,7 @@ export function AdminProductModal({
                   <ResilientImage
                     src={image}
                     alt={name || 'Playpen preview'}
-                    className="w-full h-36 rounded-2xl object-cover bg-[#E6EAE4]"
+                    className="w-full aspect-[4/3] rounded-2xl object-cover bg-[#E6EAE4]"
                   />
                 </div>
                 <div className="sm:col-span-9 space-y-3">
@@ -423,16 +425,15 @@ export function AdminProductModal({
                         className="min-h-[44px] px-3 py-2 rounded-xl bg-[#FAFAF8] text-base sm:text-xs text-[#142220] border border-[#142220]/10 focus:outline-none"
                       >
                         <option value="">Studio Preset</option>
-                        <option value={PLAYPEN_IMAGES.woodenSquare}>Wooden Slatted Square</option>
-                        <option value={PLAYPEN_IMAGES.modularCompound}>Modular Play Compound</option>
-                        <option value={PLAYPEN_IMAGES.meshExtraLarge}>Breathable Mesh XL</option>
-                        <option value={PLAYPEN_IMAGES.foldableActivity}>Foldable Activity Wall</option>
-                        <option value={PLAYPEN_IMAGES.creamArchitectural}>Floor-Level Cream Birch</option>
-                        <option value={PLAYPEN_IMAGES.travelPortable}>Portable Travel &amp; Mats</option>
-                        <option value={PLAYPEN_IMAGES.atelierFront}>Signature Atelier Front</option>
-                        <option value={PLAYPEN_IMAGES.atelierFolded}>Folded Slim Profile</option>
-                        <option value={PLAYPEN_IMAGES.atelierJoinery}>Timber &amp; Brass Joinery</option>
-                        <option value={PLAYPEN_IMAGES.atelierVilla}>UAE Villa Lounge</option>
+                        <option value={PLAYPEN_IMAGES.p1_1}>Foldable Play Mat (120×120×1cm)</option>
+                        <option value={PLAYPEN_IMAGES.p2_1}>Playpen Fence (10 Balls &amp; 2 Rings)</option>
+                        <option value={PLAYPEN_IMAGES.p3_1}>100 Pcs Ocean Balls (5.5cm)</option>
+                        <option value={PLAYPEN_IMAGES.p4_1}>Extra Large Activity Playpen with Gate</option>
+                        <option value={PLAYPEN_IMAGES.p5_1}>Playpen Fence with Mat &amp; 50 Balls</option>
+                        <option value={PLAYPEN_IMAGES.p6_1}>Baby Playpen with 2 Pull Rings &amp; Bag</option>
+                        <option value={PLAYPEN_IMAGES.p7_1}>Foldable Play Mat (150×180×1.3cm)</option>
+                        <option value={PLAYPEN_IMAGES.p8_1}>50 PCS Pastel Ball Pit Balls (5.5cm)</option>
+                        <option value={PLAYPEN_IMAGES.p9_1}>Multicolor Playpen with Basketball Hoop</option>
                       </select>
                     </div>
                   </div>
@@ -450,7 +451,7 @@ export function AdminProductModal({
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    placeholder="e.g. Solid Beechwood Square Playpen"
+                    placeholder="e.g. Baby Playpen with 2 Pull Rings and Carry Bag"
                     className="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl bg-[#F1F3EF] text-base sm:text-sm border border-[#142220]/10 focus:outline-none"
                   />
                 </div>
@@ -462,7 +463,7 @@ export function AdminProductModal({
                     type="text"
                     value={subtitle}
                     onChange={(e) => setSubtitle(e.target.value)}
-                    placeholder="Solid Wood Playpen for Living Rooms"
+                    placeholder="Breathable mesh play yard with carry bag"
                     className="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl bg-[#F1F3EF] text-base sm:text-sm border border-[#142220]/10 focus:outline-none"
                   />
                 </div>
@@ -476,14 +477,10 @@ export function AdminProductModal({
                     onChange={(e) => setCategory(e.target.value as ProductCategory)}
                     className="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl bg-[#F1F3EF] text-base sm:text-sm border border-[#142220]/10 focus:outline-none"
                   >
-                    <option value="wooden">Wooden Playpens</option>
-                    <option value="foldable">Foldable Playpens</option>
                     <option value="mesh">Mesh Playpens</option>
-                    <option value="large">Large Playpens</option>
-                    <option value="modular">Modular Playpens</option>
-                    <option value="travel">Travel Playpens</option>
-                    <option value="premium">Premium Playpens</option>
-                    <option value="signature">Signature Collection</option>
+                    <option value="large">Gate &amp; Activity Playpens</option>
+                    <option value="foldable">Foldable Play Mats</option>
+                    <option value="balls">Ocean Ball Sets</option>
                   </select>
                 </div>
 
@@ -496,6 +493,7 @@ export function AdminProductModal({
                       required
                       min={1}
                       max={100000}
+                      step="0.01"
                       type="number"
                       value={priceAed}
                       onChange={(e) => setPriceAed(e.target.value)}
@@ -529,7 +527,7 @@ export function AdminProductModal({
                     type="text"
                     value={dimensions}
                     onChange={(e) => setDimensions(e.target.value)}
-                    placeholder="150 × 150 × 74 cm"
+                    placeholder="120 × 120 × 65 cm"
                     className="w-full min-h-[44px] px-3.5 py-2 rounded-xl bg-[#F1F3EF] text-base sm:text-xs border border-[#142220]/10 focus:outline-none"
                   />
                 </div>
@@ -589,7 +587,7 @@ export function AdminProductModal({
                     type="text"
                     value={weightCapacity}
                     onChange={(e) => setWeightCapacity(e.target.value)}
-                    placeholder="35 kg Tested Frame"
+                    placeholder="Up to 35 kg"
                     className="w-full min-h-[44px] px-3.5 py-2 rounded-xl bg-[#F1F3EF] text-base sm:text-xs border border-[#142220]/10 focus:outline-none"
                   />
                 </div>
@@ -601,7 +599,7 @@ export function AdminProductModal({
                     type="text"
                     value={ageSuitability}
                     onChange={(e) => setAgeSuitability(e.target.value)}
-                    placeholder="0 – 36 Months"
+                    placeholder="0 – 48 Months"
                     className="w-full min-h-[44px] px-3.5 py-2 rounded-xl bg-[#F1F3EF] text-base sm:text-xs border border-[#142220]/10 focus:outline-none"
                   />
                 </div>
@@ -691,7 +689,7 @@ export function AdminProductModal({
                     type="text"
                     value={customSize}
                     onChange={(e) => setCustomSize(e.target.value)}
-                    placeholder="Add custom size (e.g. 220 × 180 cm Grand)"
+                    placeholder="Add custom size (e.g. 150cm x 180cm)"
                     className="flex-1 min-h-[44px] px-3 py-2 rounded-xl bg-[#FAFAF8] text-base sm:text-xs border border-[#142220]/10 focus:outline-none"
                   />
                   <button

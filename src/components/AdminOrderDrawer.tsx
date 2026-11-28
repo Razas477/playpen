@@ -10,6 +10,7 @@ import {
   XCircle,
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
+import { formatAed } from '../data/catalog';
 import {
   formatOrderTimestamp,
   UAE_EMIRATES,
@@ -440,7 +441,7 @@ export function AdminOrderDrawer({
                     <span>Items Ordered ({order.itemCount})</span>
                   </p>
                   <span className="text-sm font-bold text-[#142220] tabular-nums">
-                    Total AED {order.totalAed}
+                    Total {formatAed(order.totalAed)}
                   </span>
                 </div>
 
@@ -450,7 +451,7 @@ export function AdminOrderDrawer({
                       <ResilientImage
                         src={item.productImage}
                         alt={item.productName}
-                        className="w-12 h-14 rounded-xl object-cover bg-[#E6EAE4] shrink-0"
+                        className="w-16 h-12 rounded-xl object-cover bg-[#E6EAE4] shrink-0"
                       />
                       <div className="flex-1 min-w-0">
                         <p className="text-xs font-semibold text-[#142220] truncate">
@@ -458,11 +459,11 @@ export function AdminOrderDrawer({
                         </p>
                         <p className="text-xs text-[#4A5B57]">
                           Size: {item.selectedSize} · Color: {item.selectedColor} · Qty:{' '}
-                          {item.quantity} × AED {item.unitPriceAed}
+                          {item.quantity} × {formatAed(item.unitPriceAed)}
                         </p>
                       </div>
                       <span className="text-xs font-semibold text-[#142220] tabular-nums shrink-0">
-                        AED {item.lineTotalAed}
+                        {formatAed(item.lineTotalAed)}
                       </span>
                     </div>
                   ))}
@@ -470,13 +471,13 @@ export function AdminOrderDrawer({
 
                 <div className="pt-2 border-t border-[#142220]/10 flex justify-between text-xs text-[#3C4B48]">
                   <span>
-                    Subtotal AED {order.subtotalAed} + Delivery{' '}
+                    Subtotal {formatAed(order.subtotalAed)} + Delivery{' '}
                     {order.deliveryFeeAed === 0
                       ? 'Free'
-                      : `AED ${order.deliveryFeeAed}`}
+                      : formatAed(order.deliveryFeeAed)}
                   </span>
                   <span className="font-semibold text-[#142220] tabular-nums">
-                    AED {order.totalAed}
+                    {formatAed(order.totalAed)}
                   </span>
                 </div>
               </div>

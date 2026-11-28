@@ -2,14 +2,10 @@ export type PageRoute =
   | 'home'
   | 'collections'
   | 'shop'
-  | 'wooden'
-  | 'foldable'
   | 'mesh'
   | 'large'
-  | 'modular'
-  | 'travel'
-  | 'premium'
-  | 'signature'
+  | 'foldable'
+  | 'balls'
   | 'about'
   | 'journal'
   | 'contact'
@@ -18,23 +14,15 @@ export type PageRoute =
   | 'account'
   | 'admin';
 
-export type ProductCategory =
-  | 'wooden'
-  | 'foldable'
-  | 'mesh'
-  | 'large'
-  | 'modular'
-  | 'travel'
-  | 'premium'
-  | 'signature';
+export type ProductCategory = 'mesh' | 'large' | 'foldable' | 'balls';
 
 export type DimensionsGroup = 'Compact' | 'Standard' | 'Large' | 'Extra Large';
 
 export type MaterialGroup =
-  | 'Solid Beechwood'
-  | 'Breathable Mesh'
-  | 'Architectural HDPE'
-  | 'Anodized Aluminum & Linen';
+  | 'Breathable Mesh & Cationic'
+  | 'HDPE Activity Fence'
+  | 'Waterproof XPE Foam'
+  | 'BPA-Free PE Plastic';
 
 export interface ProductColorOption {
   name: string;
@@ -56,6 +44,11 @@ export interface Product {
   categoryLabel: string;
   subCategory?: string;
   priceAed: number;
+  originalPriceAed?: number;
+  priceRangeMaxAed?: number;
+  sizePricesAed?: Record<string, number>;
+  rating?: number;
+  reviewCount?: number;
   image: string;
   aspect?: '3:4' | '4:3';
   dimensions: string;
@@ -95,7 +88,6 @@ export interface HeroChapter {
   bgColor: string;
   surfaceColor: string;
   image: string;
-  mobileImage?: string;
   featuredProductId: string;
 }
 

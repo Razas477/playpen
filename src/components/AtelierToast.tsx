@@ -37,7 +37,7 @@ export function AtelierToast({
             hasStickyBottomBar ? 'bottom-20 lg:bottom-5' : 'bottom-4 sm:bottom-5'
           } right-4 sm:right-5 z-50 w-[calc(100%-2rem)] sm:w-[calc(100%-2.5rem)] max-w-sm rounded-2xl bg-[#142220] text-[#FAFAF8] p-3.5 sm:p-4 shadow-2xl border border-[#FAFAF8]/12 flex items-center gap-3`}
         >
-          <div className="w-12 h-12 rounded-xl overflow-hidden bg-[#1F3532] shrink-0">
+          <div className="w-16 h-12 rounded-xl overflow-hidden bg-[#1F3532] shrink-0">
             <ResilientImage
               src={notice.product.image}
               alt={notice.product.name}

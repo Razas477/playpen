@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Heart, Eye, ShoppingBag, Maximize2 } from 'lucide-react';
+import { Heart, Eye, ShoppingBag, Maximize2, Star } from 'lucide-react';
+import { formatAed } from '../data/catalog';
 import { Product } from '../types/store';
 import { ResilientImage } from './ResilientImage';
 
@@ -27,8 +28,8 @@ export function ProductCard({
       ? product.gallery[1].src
       : product.image;
 
-  const defaultSize = product.sizes[0] || 'Standard Frame';
-  const defaultColor = product.colors[0]?.name || 'Warm Beech';
+  const defaultSize = product.sizes[0] || '120cm x 120cm';
+  const defaultColor = product.colors[0]?.name || 'Classic';
 
   return (
     <article
@@ -165,12 +166,32 @@ export function ProductCard({
           </div>
 
           <div className="flex items-center justify-between gap-2">
-            <span className="font-serif text-base sm:text-xl text-[#142220] font-bold tabular-nums">
-              AED {product.priceAed.toLocaleString()}
-            </span>
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+                {product.originalPriceAed && product.originalPriceAed > product.priceAed && (
+                  <span className="text-xs sm:text-[13px] text-[#647370] line-through tabular-nums">
+                    {formatAed(product.originalPriceAed)}
+                  </span>
+                )}
+                <span className="font-serif text-sm min-[375px]:text-base sm:text-lg text-[#142220] font-bold tabular-nums">
+                  {product.priceRangeMaxAed
+                    ? `${formatAed(product.priceAed)} – ${formatAed(product.priceRangeMaxAed)}`
+                    : formatAed(product.priceAed)}
+                </span>
+              </div>
+              {product.rating && (
+                <div className="mt-0.5 flex items-center gap-1 text-[11px] font-semibold text-[#2B5B51]">
+                  <Star className="w-3 h-3 fill-[#C69E73] text-[#C69E73]" />
+                  <span>{product.rating.toFixed(1)}</span>
+                  <span className="text-[#647370] font-normal">
+                    ({product.reviewCount ?? 5})
+                  </span>
+                </div>
+              )}
+            </div>
             <button
               onClick={() => onSelect(product)}
-              className="hidden lg:inline-flex text-xs font-semibold text-[#142220] hover:text-[#2B5B51] hover:underline cursor-pointer"
+              className="hidden lg:inline-flex text-xs font-semibold text-[#142220] hover:text-[#2B5B51] hover:underline cursor-pointer shrink-0"
             >
               View Details →
             </button>

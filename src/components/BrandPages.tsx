@@ -14,35 +14,35 @@ const JOURNAL_ESSAYS = [
   {
     id: 'essay-1',
     kicker: 'Buying Guide · 4 min read',
-    title: 'Wooden vs. Mesh Playpens: Which One Suits Your UAE Home?',
+    title: 'Mesh Playpens vs. HDPE Activity Fences: Which Suits Your Home?',
     excerpt:
-      'Learn how your floor type, air conditioning, and room space help you pick between solid beechwood and breathable mesh.',
-    image: PLAYPEN_IMAGES.woodenSquare,
-    body: 'Many villas and apartments across Dubai and Abu Dhabi have cool tile or marble floors with air conditioning running all day. Our solid beechwood playpen keeps a sturdy wooden barrier around a thick padded play area, while our breathable mesh playpen maximizes airflow and lets you watch your baby clearly from across the room.',
-    targetRoute: 'wooden' as PageRoute,
-    cta: 'Shop Wooden Playpens',
+      'Learn how floor type, air conditioning, and room space help you pick between breathable cationic mesh and a solid HDPE fence.',
+    image: PLAYPEN_IMAGES.p6_1,
+    body: 'Many apartments and villas across Dubai and Abu Dhabi have cool tile or marble floors with air conditioning running all day. Our breathable mesh playpens maximize 360-degree airflow and let you watch your baby clearly, while our heavy-duty HDPE activity fence features thickened lockable panels and built-in toys for active toddlers.',
+    targetRoute: 'mesh' as PageRoute,
+    cta: 'Shop Mesh Playpens',
   },
   {
     id: 'essay-2',
     kicker: 'Baby Safety · 5 min read',
-    title: 'What Makes a Baby Playpen Safe from Crawling to First Steps',
+    title: 'What Makes an Activity Fence Safe from Crawling to First Steps',
     excerpt:
-      'Why bar spacing, non-slip bases, and child-proof gate locks matter as your baby learns to pull up and stand.',
-    image: PLAYPEN_IMAGES.atelierJoinery,
-    body: 'Every PLAYPEN model is tested for safety against tipping, pinching, and climbing. Our 6.2 cm bar spacing keeps little hands and heads safe while giving you a clear view inside. Smooth rounded top rails and baby-safe, non-toxic finishes protect curious toddlers every day.',
-    targetRoute: 'signature' as PageRoute,
-    cta: 'View Signature Collection',
+      'Why non-tipping interlocking panels, soft floor cushioning, and outer safety locks matter as your baby pulls up to stand.',
+    image: PLAYPEN_IMAGES.p4_1,
+    body: 'As babies start standing and cruising along rails, stability becomes essential. Our extra-large HDPE activity play yard uses thickened interlocking panels with 360-degree rotatable joints and an outer walk-through safety latch so toddlers stay safely inside without tipping.',
+    targetRoute: 'large' as PageRoute,
+    cta: 'View Activity Playpens',
   },
   {
     id: 'essay-3',
-    kicker: 'Room Planning · 3 min read',
-    title: 'How a Modular Playpen Keeps Your Living Room Neat Through Age Five',
+    kicker: 'Comfort & Care · 3 min read',
+    title: 'Choosing the Right Play Mat Thickness: 1 cm vs. 1.3 cm XPE Foam',
     excerpt:
-      'Use custom panel shapes and built-in toy organizers to create a calm, tidy play corner in any room.',
-    image: PLAYPEN_IMAGES.modularCompound,
-    body: 'Instead of plastic toys spreading across the living room floor, a modular playpen creates one safe, organized play zone. You can click the panels into a rectangle, L-shape, or wide enclosure, then adjust the shape as your baby grows into a busy toddler.',
-    targetRoute: 'modular' as PageRoute,
-    cta: 'Shop Modular Playpens',
+      'Compare our compact 120×120 cm reversible mat and spacious 150×180 cm extra-thick cushioned mat for tile or wood floors.',
+    image: PLAYPEN_IMAGES.p1_1,
+    body: 'A waterproof XPE foam mat turns any hard floor into a warm, cushioned tummy-time and play zone. Choose the 120×120×1 cm mat for compact corners or the 150×180×1.3 cm extra-thick mat when you want extra padding across larger lounges.',
+    targetRoute: 'foldable' as PageRoute,
+    cta: 'Shop Play Mats',
   },
 ];
 
@@ -92,7 +92,7 @@ export function BrandPages({ route, onNavigate }: BrandPagesProps) {
                   key={essay.id}
                   className="rounded-3xl bg-[#F1F3EF] border border-[#142220]/10 overflow-hidden grid grid-cols-1 lg:grid-cols-12 items-stretch"
                 >
-                  <div className="lg:col-span-5 min-h-[260px]">
+                  <div className="lg:col-span-5 aspect-[4/3] bg-[#E6EAE4]">
                     <ResilientImage
                       src={essay.image}
                       alt={essay.title}
@@ -166,10 +166,10 @@ export function BrandPages({ route, onNavigate }: BrandPagesProps) {
                 A Safer Space. A Happier Childhood.
               </h1>
               <p className="mt-5 text-sm sm:text-base text-[#3C4B48] leading-relaxed max-w-xl">
-                Based in Dubai Design District, PLAYPEN makes safe, stylish baby playpens for
-                families across the UAE. We replace noisy plastic fences with calm solid beechwood,
-                breathable mesh, lightweight travel frames, and modular playpens tested to strict
-                international safety standards.
+                Based in Dubai Design District, PLAYPEN provides safe, everyday baby playpens,
+                waterproof foldable XPE mats, and BPA-free ocean balls for families across the UAE.
+                Everything is built with baby-safe materials, breathable mesh panels, and simple,
+                tool-free assembly.
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
                 <button
@@ -192,8 +192,8 @@ export function BrandPages({ route, onNavigate }: BrandPagesProps) {
             <div className="lg:col-span-6">
               <div className="rounded-3xl overflow-hidden aspect-[4/3] bg-[#D7DDD5]">
                 <ResilientImage
-                  src={PLAYPEN_IMAGES.atelierVilla}
-                  alt="PLAYPEN villa playroom in Dubai"
+                  src={PLAYPEN_IMAGES.p5_1}
+                  alt="PLAYPEN cushioned baby playpen and pit balls set"
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -210,8 +210,8 @@ export function BrandPages({ route, onNavigate }: BrandPagesProps) {
                   Certified Safe
                 </h2>
                 <p className="mt-2.5 text-sm sm:text-[15px] text-[#3C4B48] leading-relaxed">
-                  Every playpen passes EN 12227 and ASTM F406 safety tests for bar spacing, strong
-                  floor grip, and child-proof double locks.
+                  Every playpen features sturdy non-tipping joints, strong floor stability, external
+                  safety zippers or latches, and child-safe rounded edges.
                 </p>
               </div>
 
@@ -221,8 +221,8 @@ export function BrandPages({ route, onNavigate }: BrandPagesProps) {
                   Baby-Safe Materials
                 </h2>
                 <p className="mt-2.5 text-sm sm:text-[15px] text-[#3C4B48] leading-relaxed">
-                  We use solid European beechwood, non-toxic water-based finishes, soft padded
-                  fabric, BPA-free HDPE plastic, and sturdy aluminum frames.
+                  We select breathable cationic fabric, waterproof BPA-free XPE foam, food-grade
+                  HDPE panels, and crush-proof virgin PE plastic balls.
                 </p>
               </div>
 
@@ -403,7 +403,7 @@ export function BrandPages({ route, onNavigate }: BrandPagesProps) {
                     rows={4}
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
-                    placeholder="Share your room measurements, preferred style (wooden, foldable, mesh), or any questions..."
+                    placeholder="Share your room measurements, preferred style (mesh playpen, activity fence, play mat), or any questions..."
                     className="w-full px-4 py-3 rounded-xl bg-[#FAFAF8] text-base sm:text-sm text-[#142220] border border-[#142220]/10 focus:outline-none"
                   />
                 </div>

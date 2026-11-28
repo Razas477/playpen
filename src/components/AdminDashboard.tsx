@@ -27,6 +27,7 @@ import {
   XCircle,
 } from 'lucide-react';
 import { User } from 'firebase/auth';
+import { formatAed } from '../data/catalog';
 import {
   deleteCategoryAdmin,
   deleteProductAdmin,
@@ -118,8 +119,8 @@ export function AdminDashboard({
   const [catDesc, setCatDesc] = useState('');
   const [catAge, setCatAge] = useState('');
   const [catGroup, setCatGroup] = useState<'playpen' | 'collection' | 'architectural'>('playpen');
-  const [catImage, setCatImage] = useState('/assets/aistudio/image_9c066a0a.png');
-  const [catOrder, setCatOrder] = useState('9');
+  const [catImage, setCatImage] = useState('/assets/products/p6_playpen_bag_rings_1.jpg');
+  const [catOrder, setCatOrder] = useState('5');
   const [savingCat, setSavingCat] = useState(false);
   const [confirmDeleteCatSlug, setConfirmDeleteCatSlug] = useState<string | null>(null);
 
@@ -649,8 +650,8 @@ export function AdminDashboard({
                 {[
                   {
                     label: 'Total Revenue',
-                    value: `AED ${metrics.totalRevenueAed.toLocaleString()}`,
-                    sub: `Collected AED ${metrics.collectedRevenueAed.toLocaleString()}`,
+                    value: formatAed(metrics.totalRevenueAed),
+                    sub: `Collected ${formatAed(metrics.collectedRevenueAed)}`,
                     onClick: () => setActiveTab('sales-reports'),
                   },
                   {
@@ -772,7 +773,7 @@ export function AdminDashboard({
                               </p>
                             </div>
                             <span className="text-sm font-bold tabular-nums text-[#142220] shrink-0">
-                              AED {ord.totalAed}
+                              {formatAed(ord.totalAed)}
                             </span>
                           </div>
                           <button
@@ -824,7 +825,7 @@ export function AdminDashboard({
                               <td className="py-3 pr-4">{ord.emirate}</td>
                               <td className="py-3 pr-4 tabular-nums">{ord.itemCount}</td>
                               <td className="py-3 pr-4 font-semibold tabular-nums">
-                                AED {ord.totalAed}
+                                {formatAed(ord.totalAed)}
                               </td>
                               <td className="py-3 pr-4">
                                 <span
@@ -930,7 +931,7 @@ export function AdminDashboard({
                             </div>
                             <div className="text-right shrink-0">
                               <span className="block text-sm font-semibold tabular-nums text-[#142220]">
-                                AED {ord.totalAed}
+                                {formatAed(ord.totalAed)}
                               </span>
                               <span className="text-[11px] text-[#5C6D69]">
                                 {formatOrderTimestamp(ord.createdAt)}
@@ -943,7 +944,7 @@ export function AdminDashboard({
                               <ResilientImage
                                 src={ord.itemsSummary[0].productImage}
                                 alt=""
-                                className="w-10 h-10 rounded-lg object-cover shrink-0"
+                                className="w-12 h-9 rounded-lg object-cover shrink-0"
                               />
                             )}
                             <div className="min-w-0 flex-1">
@@ -1017,7 +1018,7 @@ export function AdminDashboard({
                                     <ResilientImage
                                       src={ord.itemsSummary[0].productImage}
                                       alt=""
-                                      className="w-8 h-8 rounded-lg object-cover shrink-0"
+                                      className="w-12 h-9 rounded-lg object-cover shrink-0"
                                     />
                                   )}
                                   <span className="truncate text-[#142220]">
@@ -1031,7 +1032,7 @@ export function AdminDashboard({
                                 {ord.itemCount}
                               </td>
                               <td className="py-3.5 px-4 font-semibold tabular-nums text-[#142220]">
-                                AED {ord.totalAed}
+                                {formatAed(ord.totalAed)}
                               </td>
                               <td className="py-3.5 px-4 text-[#3C4B48]">
                                 {ord.paymentMethod}
@@ -1093,14 +1094,10 @@ export function AdminDashboard({
                     className="w-full sm:w-auto min-h-[44px] px-4 py-2.5 rounded-full bg-[#F1F3EF] text-base sm:text-xs font-medium border border-[#142220]/12 focus:outline-none"
                   >
                     <option value="all">All Playpen Collections</option>
-                    <option value="wooden">Wooden Playpens</option>
-                    <option value="foldable">Foldable Playpens</option>
                     <option value="mesh">Mesh Playpens</option>
-                    <option value="large">Large Playpens</option>
-                    <option value="modular">Modular Playpens</option>
-                    <option value="travel">Travel Playpens</option>
-                    <option value="premium">Premium Playpens</option>
-                    <option value="signature">Signature Collection</option>
+                    <option value="large">Gate &amp; Activity Playpens</option>
+                    <option value="foldable">Foldable Play Mats</option>
+                    <option value="balls">Ocean Ball Sets</option>
                   </select>
                 </div>
 
@@ -1130,7 +1127,7 @@ export function AdminDashboard({
                         <ResilientImage
                           src={p.image}
                           alt={p.name}
-                          className="w-24 h-28 rounded-2xl object-cover bg-[#E6EAE4] shrink-0"
+                          className="w-28 h-[84px] rounded-2xl object-cover bg-[#E6EAE4] shrink-0"
                         />
                         <div className="flex-1 min-w-0">
                           <div className="flex flex-wrap gap-1.5 mb-1">
@@ -1152,7 +1149,8 @@ export function AdminDashboard({
                             {p.categoryLabel}
                           </p>
                           <p className="mt-1.5 text-sm font-bold text-[#142220] tabular-nums">
-                            AED {p.priceAed}
+                            {formatAed(p.priceAed)}
+                            {p.priceRangeMaxAed ? ` – ${formatAed(p.priceRangeMaxAed)}` : ''}
                           </p>
                           <p className="mt-1 text-xs text-[#4A5B57]">
                             {p.sizes.length} sizes · {p.colors.length} colors ·{' '}
@@ -1226,7 +1224,7 @@ export function AdminDashboard({
                       <ResilientImage
                         src={cat.image}
                         alt={cat.label}
-                        className="w-14 h-14 rounded-xl object-cover shrink-0"
+                        className="w-16 h-12 rounded-xl object-cover shrink-0"
                       />
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
@@ -1716,7 +1714,7 @@ export function AdminDashboard({
                           </div>
                           <div className="text-right shrink-0 tabular-nums">
                             <p className="text-xs font-semibold text-[#142220]">
-                              AED {cust.totalSpendAed.toLocaleString()}
+                              {formatAed(cust.totalSpendAed)}
                             </p>
                             <p className="text-[11px] text-[#5C6D69]">
                               {cust.orderCount} {cust.orderCount === 1 ? 'order' : 'orders'}
@@ -1774,7 +1772,7 @@ export function AdminDashboard({
                       <div className="rounded-2xl bg-[#FAFAF8] p-3">
                         <p className="text-[#4A5B57] font-medium">Total Spent</p>
                         <p className="mt-1 font-serif text-xl font-bold tabular-nums">
-                          AED {selectedCustomer.totalSpendAed.toLocaleString()}
+                          {formatAed(selectedCustomer.totalSpendAed)}
                         </p>
                       </div>
                     </div>
@@ -1817,7 +1815,7 @@ export function AdminDashboard({
                                 </p>
                               </div>
                               <span className="font-semibold tabular-nums">
-                                AED {ord.totalAed}
+                                {formatAed(ord.totalAed)}
                               </span>
                             </button>
                           ))}
@@ -1860,29 +1858,27 @@ export function AdminDashboard({
                 <div className="rounded-3xl bg-[#F1F3EF] p-5">
                   <p className="text-xs font-medium text-[#4A5B57]">Total Order Value</p>
                   <p className="mt-1 font-serif text-2xl font-bold tabular-nums">
-                    AED {metrics.totalRevenueAed.toLocaleString()}
+                    {formatAed(metrics.totalRevenueAed)}
                   </p>
                 </div>
                 <div className="rounded-3xl bg-[#F1F3EF] p-5">
                   <p className="text-xs font-medium text-[#4A5B57]">Collected (Delivered)</p>
                   <p className="mt-1 font-serif text-2xl font-bold tabular-nums text-[#1E4639]">
-                    AED {metrics.collectedRevenueAed.toLocaleString()}
+                    {formatAed(metrics.collectedRevenueAed)}
                   </p>
                 </div>
                 <div className="rounded-3xl bg-[#F1F3EF] p-5">
                   <p className="text-xs font-medium text-[#4A5B57]">Pending Cash Collection</p>
                   <p className="mt-1 font-serif text-2xl font-bold tabular-nums">
-                    AED{' '}
-                    {Math.max(
-                      0,
-                      metrics.totalRevenueAed - metrics.collectedRevenueAed
-                    ).toLocaleString()}
+                    {formatAed(
+                      Math.max(0, metrics.totalRevenueAed - metrics.collectedRevenueAed)
+                    )}
                   </p>
                 </div>
                 <div className="rounded-3xl bg-[#F1F3EF] p-5">
                   <p className="text-xs font-medium text-[#4A5B57]">Average Order Value</p>
                   <p className="mt-1 font-serif text-2xl font-bold tabular-nums">
-                    AED {salesAnalytics.aov.toLocaleString()}
+                    {formatAed(salesAnalytics.aov)}
                   </p>
                 </div>
               </div>
@@ -1903,7 +1899,7 @@ export function AdminDashboard({
                               {row.emirate} ({row.orders} orders)
                             </span>
                             <span className="font-semibold tabular-nums">
-                              AED {row.revenue.toLocaleString()}
+                              {formatAed(row.revenue)}
                             </span>
                           </div>
                           <div className="h-1.5 w-full rounded-full bg-[#D7DDD5] overflow-hidden">
@@ -1942,7 +1938,7 @@ export function AdminDashboard({
                               {row.categoryLabel} ({row.units} units)
                             </span>
                             <span className="font-semibold tabular-nums">
-                              AED {row.revenue.toLocaleString()}
+                              {formatAed(row.revenue)}
                             </span>
                           </div>
                           <div className="h-1.5 w-full rounded-full bg-[#D7DDD5] overflow-hidden">

@@ -6,6 +6,7 @@ import {
   Truck,
 } from 'lucide-react';
 import { motion } from 'motion/react';
+import { formatAed } from '../data/catalog';
 import { formatOrderTimestamp } from '../lib/storeDb';
 import { OrderRecord, PageRoute } from '../types/store';
 import { ResilientImage } from './ResilientImage';
@@ -145,7 +146,7 @@ export function OrderConfirmationPage({
                   <ResilientImage
                     src={item.productImage}
                     alt={item.productName}
-                    className="w-16 h-16 rounded-xl object-cover bg-[#D7DDD5] shrink-0"
+                    className="w-16 h-12 rounded-xl object-cover bg-[#D7DDD5] shrink-0"
                   />
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-semibold text-[#142220] truncate">
@@ -158,10 +159,10 @@ export function OrderConfirmationPage({
                   </div>
                   <div className="text-right shrink-0">
                     <p className="text-sm font-bold text-[#142220] tabular-nums">
-                      AED {item.lineTotalAed.toLocaleString()}
+                      {formatAed(item.lineTotalAed)}
                     </p>
                     <p className="text-xs text-[#4A5B57] tabular-nums">
-                      AED {item.unitPriceAed.toLocaleString()} each
+                      {formatAed(item.unitPriceAed)} each
                     </p>
                   </div>
                 </div>
@@ -172,18 +173,18 @@ export function OrderConfirmationPage({
               <div className="flex justify-between">
                 <span>Subtotal</span>
                 <span className="tabular-nums font-semibold text-[#142220]">
-                  AED {order.subtotalAed.toLocaleString()}
+                  {formatAed(order.subtotalAed)}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span>UAE Delivery</span>
                 <span className="tabular-nums font-semibold text-[#142220]">
-                  {order.deliveryFeeAed === 0 ? 'Free' : `AED ${order.deliveryFeeAed}`}
+                  {order.deliveryFeeAed === 0 ? 'Free' : formatAed(order.deliveryFeeAed)}
                 </span>
               </div>
               <div className="pt-2 border-t border-[#142220]/10 flex justify-between text-base font-bold text-[#142220]">
                 <span>Total Amount</span>
-                <span className="tabular-nums">AED {order.totalAed.toLocaleString()}</span>
+                <span className="tabular-nums">{formatAed(order.totalAed)}</span>
               </div>
             </div>
           </div>

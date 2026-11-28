@@ -14,7 +14,7 @@ import {
   XCircle,
 } from 'lucide-react';
 import { User } from 'firebase/auth';
-import { PRODUCTS } from '../data/catalog';
+import { formatAed, PRODUCTS } from '../data/catalog';
 import {
   advanceOrderStatusAdmin,
   cancelCustomerOrder,
@@ -493,7 +493,7 @@ export function AccountPage({
 
                       <div className="text-left sm:text-right">
                         <span className="block text-xl font-semibold tabular-nums">
-                          AED {order.totalAed}
+                          {formatAed(order.totalAed)}
                         </span>
                         <span className="text-xs text-[#5C6D69]">
                           {order.itemCount} {order.itemCount === 1 ? 'item' : 'items'} · {order.emirate}
@@ -510,7 +510,7 @@ export function AccountPage({
                           <ResilientImage
                             src={item.productImage}
                             alt={item.productName}
-                            className="w-14 h-14 rounded-xl object-cover shrink-0"
+                            className="w-16 h-12 rounded-xl object-cover shrink-0"
                           />
                           <div className="min-w-0 flex-1">
                             <p className="text-xs font-semibold text-[#142220] truncate">
@@ -520,7 +520,7 @@ export function AccountPage({
                               {item.selectedSize} · {item.selectedColor} · Qty {item.quantity}
                             </p>
                             <p className="text-xs font-medium text-[#142220] tabular-nums mt-0.5">
-                              AED {item.lineTotalAed}
+                              {formatAed(item.lineTotalAed)}
                             </p>
                           </div>
                         </div>
@@ -825,7 +825,7 @@ export function AccountPage({
                                 <ResilientImage
                                   src={it.productImage}
                                   alt={it.productName}
-                                  className="w-12 h-12 rounded-lg object-cover shrink-0"
+                                  className="w-16 h-12 rounded-lg object-cover shrink-0"
                                 />
                                 <div className="min-w-0 flex-1">
                                   <p className="text-xs font-medium text-[#142220] truncate">
@@ -836,7 +836,7 @@ export function AccountPage({
                                   </p>
                                 </div>
                                 <span className="text-xs font-semibold tabular-nums">
-                                  AED {it.lineTotalAed}
+                                  {formatAed(it.lineTotalAed)}
                                 </span>
                               </div>
                             ))}

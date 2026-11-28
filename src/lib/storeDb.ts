@@ -18,7 +18,9 @@ import {
 import { signInWithPopup, signOut, User } from 'firebase/auth';
 import {
   CATEGORY_DIRECTORY,
+  getProductUnitPrice,
   PRODUCTS,
+  roundCurrency,
 } from '../data/catalog';
 import {
   CartItem,
@@ -51,14 +53,10 @@ import {
 export const ADMIN_EMAIL = 'alio1234599ol@gmail.com';
 
 export const VALID_PLAYPEN_CATEGORIES = new Set<ProductCategory>([
-  'wooden',
-  'foldable',
   'mesh',
   'large',
-  'modular',
-  'travel',
-  'premium',
-  'signature',
+  'foldable',
+  'balls',
 ]);
 
 export const ORDER_TIMELINE_STEPS: OrderStatus[] = [
@@ -326,15 +324,18 @@ export async function syncCatalogIfAdmin(user: User): Promise<boolean> {
       getDocs(collection(db, 'products')),
     ]);
 
-    const hasLegacyCategory = catSnap.docs.some(
-      (d) => !VALID_PLAYPEN_CATEGORIES.has(d.id as ProductCategory)
+    const validCatIds = new Set(CATEGORY_DIRECTORY.map((c) => sanitizeId(c.route)));
+    const validProdIds = new Set(PRODUCTS.map((p) => sanitizeId(p.id)));
+
+    const hasLegacyCategory = catSnap.docs.some((d) => !validCatIds.has(d.id));
+    const hasLegacyProduct = prodSnap.docs.some(
+      (d) => !validProdIds.has(d.id) && !d.id.startsWith('pp-')
     );
-    const hasLegacyProduct = prodSnap.docs.some((d) => {
-      const cat = String(d.data().categoryId || '');
-      return !VALID_PLAYPEN_CATEGORIES.has(cat as ProductCategory);
-    });
-    const hasSignatureSeed = prodSnap.docs.some(
-      (d) => d.id === 'al-saadiyat-beechwood-square'
+    const hasPdfSeed = prodSnap.docs.some(
+      (d) => d.id === 'versatile-foldable-baby-play-mat-120x120'
+    );
+    const missingAnyPdfProduct = PRODUCTS.some(
+      (p) => !prodSnap.docs.some((d) => d.id === sanitizeId(p.id))
     );
 
     if (
@@ -342,7 +343,8 @@ export async function syncCatalogIfAdmin(user: User): Promise<boolean> {
       prodSnap.empty ||
       hasLegacyCategory ||
       hasLegacyProduct ||
-      !hasSignatureSeed
+      !hasPdfSeed ||
+      missingAnyPdfProduct
     ) {
       await seedFullCatalogToFirestore();
       return true;
@@ -355,7 +357,7 @@ export async function syncCatalogIfAdmin(user: User): Promise<boolean> {
 }
 
 export async function seedFullCatalogToFirestore(): Promise<void> {
-  // Purge legacy non-playpen catalog entries cleanly first
+  // Purge legacy non-PDF catalog entries cleanly first
   const deleteOps: Array<{ col: string; id: string }> = [];
   const [catSnap, prodSnap, sizeSnap, colorSnap, invSnap] = await Promise.all([
     getDocs(collection(db, 'categories')),
@@ -372,8 +374,7 @@ export async function seedFullCatalogToFirestore(): Promise<void> {
     if (!validCatIds.has(d.id)) deleteOps.push({ col: 'categories', id: d.id });
   });
   prodSnap.docs.forEach((d) => {
-    const catId = String(d.data().categoryId || '');
-    if (!validProdIds.has(d.id) && !VALID_PLAYPEN_CATEGORIES.has(catId as ProductCategory)) {
+    if (!validProdIds.has(d.id) && !d.id.startsWith('pp-')) {
       deleteOps.push({ col: 'products', id: d.id });
     }
   });
@@ -682,12 +683,17 @@ export async function placeOrderInFirestore(
     handleFirestoreError(error, OperationType.GET, `orders/${orderId}`);
   }
 
-  const subtotalAed = payload.items.reduce(
-    (sum, item) => sum + Number(item.product.priceAed) * Number(item.quantity),
-    0
+  const subtotalAed = roundCurrency(
+    payload.items.reduce((sum, item) => {
+      const unit = getProductUnitPrice(item.product, item.size);
+      const qty = Math.max(1, Math.min(50, Number(item.quantity)));
+      return sum + roundCurrency(unit * qty);
+    }, 0)
   );
-  const deliveryFeeAed = computeDeliveryFee(subtotalAed, payload.storeSettings);
-  const totalAed = subtotalAed + deliveryFeeAed;
+  const deliveryFeeAed = roundCurrency(
+    computeDeliveryFee(subtotalAed, payload.storeSettings)
+  );
+  const totalAed = roundCurrency(subtotalAed + deliveryFeeAed);
   const itemCount = payload.items.reduce((sum, item) => sum + item.quantity, 0);
   const estimatedDelivery = getEstimatedDeliveryWindow(payload.emirate);
   const defaultCourier =
@@ -700,17 +706,20 @@ export async function placeOrderInFirestore(
     360
   );
 
-  const itemsSummary: OrderSummaryItem[] = payload.items.slice(0, 25).map((item) => ({
-    productId: sanitizeId(item.product.id),
-    productName: clampStr(item.product.name, 160),
-    productImage: sanitizeImageUrl(item.product.image),
-    selectedSize: clampStr(item.size || 'Standard Frame', 64),
-    selectedColor: clampStr(item.color || 'Signature', 80),
-    quantity: Math.max(1, Math.min(50, item.quantity)),
-    unitPriceAed: Number(item.product.priceAed),
-    lineTotalAed:
-      Number(item.product.priceAed) * Math.max(1, Math.min(50, item.quantity)),
-  }));
+  const itemsSummary: OrderSummaryItem[] = payload.items.slice(0, 25).map((item) => {
+    const unitPriceAed = getProductUnitPrice(item.product, item.size);
+    const qty = Math.max(1, Math.min(50, item.quantity));
+    return {
+      productId: sanitizeId(item.product.id),
+      productName: clampStr(item.product.name, 160),
+      productImage: sanitizeImageUrl(item.product.image),
+      selectedSize: clampStr(item.size || '120cm x 120cm', 64),
+      selectedColor: clampStr(item.color || 'Classic', 80),
+      quantity: qty,
+      unitPriceAed,
+      lineTotalAed: roundCurrency(unitPriceAed * qty),
+    };
+  });
 
   const invUpdates: Array<{ id: string; stockQty: number; reservedQty: number }> = [];
   for (const item of payload.items) {
@@ -766,6 +775,8 @@ export async function placeOrderInFirestore(
 
     payload.items.forEach((item, idx) => {
       const itemId = sanitizeId(`${orderId}_item_${idx + 1}`);
+      const unitPriceAed = getProductUnitPrice(item.product, item.size);
+      const qty = Math.max(1, Math.min(50, item.quantity));
       batch.set(doc(db, 'orderItems', itemId), {
         id: itemId,
         orderId,
@@ -773,12 +784,11 @@ export async function placeOrderInFirestore(
         productId: sanitizeId(item.product.id),
         productName: clampStr(item.product.name, 160),
         productImage: sanitizeImageUrl(item.product.image),
-        selectedSize: clampStr(item.size || 'Standard Frame', 64),
-        selectedColor: clampStr(item.color || 'Signature', 80),
-        quantity: Math.max(1, Math.min(50, item.quantity)),
-        unitPriceAed: Number(item.product.priceAed),
-        lineTotalAed:
-          Number(item.product.priceAed) * Math.max(1, Math.min(50, item.quantity)),
+        selectedSize: clampStr(item.size || '120cm x 120cm', 64),
+        selectedColor: clampStr(item.color || 'Classic', 80),
+        quantity: qty,
+        unitPriceAed,
+        lineTotalAed: roundCurrency(unitPriceAed * qty),
         createdAt: serverTimestamp(),
       });
     });
@@ -976,39 +986,45 @@ function mapDocToProduct(raw: Record<string, unknown>): Product | null {
   const id = String(raw.id || '');
   const categoryId = String(raw.categoryId || '') as ProductCategory;
   const staticMatch = PRODUCTS.find((p) => p.id === id);
+  const isCustomAdmin = id.startsWith('pp-');
 
-  if (!VALID_PLAYPEN_CATEGORIES.has(categoryId) && !staticMatch) {
+  if (!staticMatch && (!isCustomAdmin || !VALID_PLAYPEN_CATEGORIES.has(categoryId))) {
     return null;
   }
 
   return {
     id,
-    name: String(raw.name || staticMatch?.name || 'PLAYPEN Sanctuary Frame'),
+    name: String(raw.name || staticMatch?.name || 'PLAYPEN Product'),
     subtitle: String(raw.subtitle || staticMatch?.subtitle || ''),
     category: VALID_PLAYPEN_CATEGORIES.has(categoryId)
       ? categoryId
-      : staticMatch?.category || 'wooden',
+      : staticMatch?.category || 'mesh',
     categoryLabel: String(
-      raw.categoryLabel || staticMatch?.categoryLabel || 'Wooden Playpens'
+      raw.categoryLabel || staticMatch?.categoryLabel || 'Mesh Playpens'
     ),
     subCategory: raw.subCategory ? String(raw.subCategory) : staticMatch?.subCategory,
     priceAed: Number(raw.priceAed ?? staticMatch?.priceAed ?? 0),
+    originalPriceAed: staticMatch?.originalPriceAed,
+    priceRangeMaxAed: staticMatch?.priceRangeMaxAed,
+    sizePricesAed: staticMatch?.sizePricesAed,
+    rating: staticMatch?.rating,
+    reviewCount: staticMatch?.reviewCount,
     image: String(raw.image || staticMatch?.image || ''),
-    aspect: staticMatch?.aspect,
+    aspect: staticMatch?.aspect || '4:3',
     dimensions: String(
-      raw.dimensions || staticMatch?.dimensions || '180 × 150 × 68 cm'
+      raw.dimensions || staticMatch?.dimensions || '120 × 120 × 65 cm'
     ),
     dimensionsGroup: (raw.dimensionsGroup ||
       staticMatch?.dimensionsGroup ||
       'Standard') as DimensionsGroup,
     material: String(
-      raw.material || staticMatch?.material || 'European Beechwood & Breathable Mesh'
+      raw.material || staticMatch?.material || 'Cationic Fabric & Breathable Mesh'
     ),
     materialGroup: (raw.materialGroup ||
       staticMatch?.materialGroup ||
-      'Solid Beechwood') as MaterialGroup,
+      'Breathable Mesh & Cationic') as MaterialGroup,
     weightCapacity: String(
-      raw.weightCapacity || staticMatch?.weightCapacity || '35 kg Certified Load'
+      raw.weightCapacity || staticMatch?.weightCapacity || 'Up to 35 kg'
     ),
     ageSuitability: String(
       raw.ageSuitability || staticMatch?.ageSuitability || '0 – 48 Months'
@@ -1017,33 +1033,33 @@ function mapDocToProduct(raw: Record<string, unknown>): Product | null {
       Array.isArray(raw.safetySpecs) && raw.safetySpecs.length > 0
         ? raw.safetySpecs.map(String)
         : staticMatch?.safetySpecs || [
-            'EN 12227:2010 & ASTM F406 Playpen Certified',
-            'Zero-VOC matte finish with anti-pinch flush joinery',
+            '360-degree breathable mesh walls with clear visibility',
+            'Smooth anti-pinch corners and non-toxic materials',
           ],
     foldingAndStorage: String(
       raw.foldingAndStorage ||
         staticMatch?.foldingAndStorage ||
-        'Tool-free release joints pack flat in under two minutes for effortless storage.'
+        'Quick tool-free disassembly for compact home storage.'
     ),
     deliveryInfo: String(
       raw.deliveryInfo ||
         staticMatch?.deliveryInfo ||
-        'Complimentary white-glove delivery across Dubai, Abu Dhabi & all UAE Emirates.'
+        'Fast UAE delivery across all 7 Emirates with Cash on Delivery.'
     ),
     careNote: String(
       raw.careNote ||
         staticMatch?.careNote ||
-        'Wipe rails gently with a mild damp cloth; machine wash textile pads on 30°C cold.'
+        'Wipe fabric and mesh panels cleanly with a damp cloth.'
     ),
     originNote: String(
       raw.originNote ||
         staticMatch?.originNote ||
-        'Precision-engineered for sunlit UAE family residences.'
+        'Designed for everyday safety in UAE family homes.'
     ),
     sizes:
       Array.isArray(raw.sizes) && raw.sizes.length > 0
         ? raw.sizes.map(String)
-        : staticMatch?.sizes || ['180 × 150 cm (Standard)'],
+        : staticMatch?.sizes || ['120cm x 120cm'],
     unavailableSizes: Array.isArray(raw.unavailableSizes)
       ? raw.unavailableSizes.map(String)
       : staticMatch?.unavailableSizes || [],
@@ -1054,7 +1070,7 @@ function mapDocToProduct(raw: Record<string, unknown>): Product | null {
     colors:
       Array.isArray(raw.colors) && raw.colors.length > 0
         ? (raw.colors as ProductColorOption[])
-        : staticMatch?.colors || [{ name: 'Warm Natural Beech', hex: '#D8C7B2' }],
+        : staticMatch?.colors || [{ name: 'Soft Dove Grey', hex: '#B3B7BC' }],
     description: String(raw.description || staticMatch?.description || ''),
     benefits: Array.isArray(raw.benefits)
       ? raw.benefits.map(String)
@@ -1360,17 +1376,17 @@ export async function saveProductAdmin(
   }
 
   const cleanSizes = (
-    input.sizes.length > 0 ? input.sizes : ['180 × 150 cm (Standard)']
+    input.sizes.length > 0 ? input.sizes : ['120cm x 120cm']
   ).slice(0, 20);
   const cleanUnavailable = (input.unavailableSizes || []).slice(0, 20);
   const unavailableSet = new Set(cleanUnavailable);
   const cleanColors: ProductColorOption[] = (
-    input.colors.length > 0 ? input.colors : [{ name: 'Warm Beech', hex: '#C69E73' }]
+    input.colors.length > 0 ? input.colors : [{ name: 'Soft Dove Grey', hex: '#B3B7BC' }]
   )
     .slice(0, 15)
     .map((c) => ({
-      name: clampStr(c.name, 80) || 'Warm Beech',
-      hex: clampStr(c.hex, 16) || '#C69E73',
+      name: clampStr(c.name, 80) || 'Soft Dove Grey',
+      hex: clampStr(c.hex, 16) || '#B3B7BC',
     }));
 
   try {
@@ -1382,13 +1398,13 @@ export async function saveProductAdmin(
       categoryId: clampStr(input.category, 64),
       categoryLabel: clampStr(input.categoryLabel, 80),
       subCategory: '',
-      priceAed: Math.max(1, Math.min(100000, Number(input.priceAed))),
+      priceAed: roundCurrency(Math.max(1, Math.min(100000, Number(input.priceAed)))),
       image: cleanImage,
-      dimensions: clampStr(input.dimensions, 120) || '180 × 150 × 68 cm',
+      dimensions: clampStr(input.dimensions, 120) || '120 × 120 × 65 cm',
       dimensionsGroup: clampStr(input.dimensionsGroup, 40) || 'Standard',
       material: clampStr(input.material, 200),
-      materialGroup: clampStr(input.materialGroup, 60) || 'Solid Beechwood',
-      weightCapacity: clampStr(input.weightCapacity, 60) || '35 kg Certified Load',
+      materialGroup: clampStr(input.materialGroup, 60) || 'Breathable Mesh & Cationic',
+      weightCapacity: clampStr(input.weightCapacity, 60) || 'Up to 35 kg',
       ageSuitability: clampStr(input.ageSuitability, 80) || '0 – 48 Months',
       safetySpecs: (input.safetySpecs || []).slice(0, 12),
       foldingAndStorage: clampStr(input.foldingAndStorage, 400),
@@ -1397,7 +1413,7 @@ export async function saveProductAdmin(
       originNote: clampStr(input.originNote, 240),
       description: clampStr(input.description, 1000),
       featuredTag: clampStr(
-        input.featuredTag || (input.isFeatured ? 'Architectural Edition' : ''),
+        input.featuredTag || (input.isFeatured ? 'Featured Edition' : ''),
         80
       ),
       sizes: cleanSizes,

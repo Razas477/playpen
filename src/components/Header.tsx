@@ -12,6 +12,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { User } from 'firebase/auth';
+import { formatAed } from '../data/catalog';
 import { PageRoute, Product } from '../types/store';
 
 interface HeaderProps {
@@ -86,12 +87,11 @@ export function Header({
     sublabel?: string;
   }> = [
     { label: 'Home', route: 'home' },
-    { label: 'Shop Now', route: 'shop', sublabel: 'All Playpens & Filters' },
-    { label: 'Wooden Playpens', route: 'wooden', sublabel: 'Solid Beechwood' },
-    { label: 'Foldable Playpens', route: 'foldable', sublabel: 'Folds in 15 Seconds' },
-    { label: 'Mesh Playpens', route: 'mesh', sublabel: 'Breathable Mesh Sides' },
-    { label: 'Travel Playpens', route: 'travel', sublabel: 'Lightweight & Portable' },
-    { label: 'Premium Collection', route: 'premium', sublabel: 'Luxury Wood & Soft Fabric' },
+    { label: 'Shop Now', route: 'shop', sublabel: 'All Playpens, Mats & Balls' },
+    { label: 'Mesh Playpens', route: 'mesh', sublabel: 'Breathable 360° Mesh Sides' },
+    { label: 'Gate & Activity Playpens', route: 'large', sublabel: 'Sturdy HDPE Panels & Hoop' },
+    { label: 'Foldable Play Mats', route: 'foldable', sublabel: 'Waterproof XPE Foam Mats' },
+    { label: 'Ocean Ball Sets', route: 'balls', sublabel: 'Soft 5.5cm BPA-Free Balls' },
     { label: 'About Us', route: 'about' },
     { label: 'Contact Us', route: 'contact', sublabel: 'Dubai & Abu Dhabi Support' },
     { label: 'My Account', route: 'account', sublabel: user ? user.email || 'Account & Orders' : 'Orders & Tracking' },
@@ -100,14 +100,10 @@ export function Header({
   const isCollectionRoute = (
     [
       'collections',
-      'wooden',
-      'foldable',
       'mesh',
       'large',
-      'modular',
-      'travel',
-      'premium',
-      'signature',
+      'foldable',
+      'balls',
     ] as PageRoute[]
   ).includes(currentRoute);
 
@@ -419,9 +415,10 @@ export function Header({
               <div className="flex flex-wrap gap-2">
                 {(
                   [
-                    ['large', 'Large Playpens'],
-                    ['modular', 'Modular Playpens'],
-                    ['signature', 'Signature Collection'],
+                    ['mesh', 'Mesh Playpens'],
+                    ['large', 'Gate & Activity Playpens'],
+                    ['foldable', 'Foldable Play Mats'],
+                    ['balls', 'Ocean Ball Sets'],
                     ['collections', 'Lookbook'],
                   ] as Array<[PageRoute, string]>
                 ).map(([route, label]) => (
@@ -497,7 +494,7 @@ export function Header({
                 autoFocus
                 value={searchQuery}
                 onChange={(e) => onSearchChange(e.target.value)}
-                placeholder="Search wooden, foldable, mesh, or travel playpens..."
+                placeholder="Search playpens, play mats, or ocean balls..."
                 className="flex-1 bg-transparent text-base sm:text-sm text-[#142220] placeholder:text-[#4A5B57] focus:outline-none min-w-0"
               />
               <button
@@ -513,7 +510,7 @@ export function Header({
             <div className="max-h-[68vh] sm:max-h-[60vh] overflow-y-auto p-3 sm:p-4 divide-y divide-[#142220]/8">
               {searchResults.length === 0 ? (
                 <p className="py-10 text-center text-sm text-[#4A5B57]">
-                  No playpens match “{searchQuery}”. Try searching “Wooden”, “Foldable”, or “Travel”.
+                  No products match “{searchQuery}”. Try searching “Mesh”, “Mat”, “Gate”, or “Balls”.
                 </p>
               ) : (
                 searchResults.map((p) => (
@@ -529,7 +526,7 @@ export function Header({
                     <img
                       src={p.image}
                       alt={p.name}
-                      className="w-14 h-14 rounded-lg object-cover bg-[#E6EAE4] shrink-0"
+                      className="w-16 h-12 rounded-lg object-cover bg-[#E6EAE4] shrink-0"
                     />
                     <div className="flex-1 min-w-0">
                       <p className="font-serif text-base font-semibold text-[#142220] truncate">
@@ -540,7 +537,9 @@ export function Header({
                       </p>
                     </div>
                     <span className="text-xs font-semibold text-[#142220] tabular-nums whitespace-nowrap">
-                      AED {p.priceAed.toLocaleString()}
+                      {p.priceRangeMaxAed
+                        ? `${formatAed(p.priceAed)} – ${formatAed(p.priceRangeMaxAed)}`
+                        : formatAed(p.priceAed)}
                     </span>
                   </button>
                 ))

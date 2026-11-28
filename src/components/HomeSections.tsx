@@ -41,7 +41,7 @@ export function HomeSections({
 
   return (
     <div className="bg-[#FAFAF8]">
-      {/* 1. Animated 8-Chapter Scroll Editorial Lookbook */}
+      {/* 1. Animated 4-Chapter Scroll Editorial Lookbook */}
       <PlaypenCollectionsView
         products={products}
         embedded
@@ -111,7 +111,7 @@ export function HomeSections({
         </div>
       </section>
 
-      {/* 3. Eight Specialized Playpen Collections Grid */}
+      {/* 3. Four Specialized Playpen Collections Grid */}
       <section className="py-14 sm:py-20 px-4 sm:px-8 lg:px-12 bg-[#F1F3EF] border-y border-[#142220]/8">
         <div className="max-w-[1440px] mx-auto">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8 sm:mb-10">
@@ -193,8 +193,8 @@ export function HomeSections({
               Safe, Easy-Clean Materials
             </h3>
             <p className="text-sm sm:text-[15px] text-[#3C4B48] leading-relaxed">
-              We use smooth solid beechwood, BPA-free plastic, soft cushioned fabric, and
-              breathable mesh that wipe clean in seconds and look great at home.
+              We use breathable cationic fabric, food-grade HDPE panels, waterproof XPE foam, and
+              BPA-free plastic that wipe clean in seconds and look great at home.
             </p>
           </div>
 

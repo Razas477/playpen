@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ArrowRight, ShieldCheck } from 'lucide-react';
 import { PageRoute, Product } from '../types/store';
-import { HERO_CHAPTERS } from '../data/catalog';
+import { formatAed, HERO_CHAPTERS } from '../data/catalog';
 import { ResilientImage } from './ResilientImage';
 
 interface HeroEditorialProps {
@@ -59,10 +59,10 @@ export function HeroEditorial({
           </p>
         </div>
 
-        {/* Portrait Playpen Showcase — Full Frame Without Cropping */}
+        {/* Uniform 4:3 Playpen Showcase — Full Frame Without Cropping */}
         <div className="mt-4 relative">
           <div
-            className="relative aspect-[4/5] max-h-[390px] sm:max-h-[450px] w-full rounded-[22px] overflow-hidden shadow-[0_22px_50px_rgba(20,34,32,0.14)] border border-[#142220]/10"
+            className="relative aspect-[4/3] w-full rounded-[22px] overflow-hidden shadow-[0_22px_50px_rgba(20,34,32,0.14)] border border-[#142220]/10"
             style={{ backgroundColor: currentChapter.surfaceColor }}
           >
             {HERO_CHAPTERS.map((chap, idx) => (
@@ -75,7 +75,7 @@ export function HeroEditorial({
                 }`}
               >
                 <ResilientImage
-                  src={chap.mobileImage || chap.image}
+                  src={chap.image}
                   alt={chap.headline.replace('\n', ' ')}
                   fallbackTitle={chap.kicker}
                   className="w-full h-full object-cover object-center"
@@ -146,7 +146,9 @@ export function HeroEditorial({
                 </h2>
               </div>
               <span className="text-sm font-bold text-[#142220] whitespace-nowrap tabular-nums">
-                AED {featuredProduct.priceAed.toLocaleString()}
+                {featuredProduct.priceRangeMaxAed
+                  ? `${formatAed(featuredProduct.priceAed)} – ${formatAed(featuredProduct.priceRangeMaxAed)}`
+                  : formatAed(featuredProduct.priceAed)}
               </span>
             </div>
 
@@ -231,10 +233,10 @@ export function HeroEditorial({
               </div>
             </div>
 
-            {/* Right Full-Scale Architectural Playpen Showcase */}
+            {/* Right Uniform 4:3 Playpen Showcase */}
             <div className="col-span-7 relative">
               <div
-                className="relative aspect-[16/11] w-full rounded-[28px] overflow-hidden shadow-[0_32px_70px_rgba(20,34,32,0.14)] border border-[#142220]/8"
+                className="relative aspect-[4/3] w-full rounded-[28px] overflow-hidden shadow-[0_32px_70px_rgba(20,34,32,0.14)] border border-[#142220]/8"
                 style={{ backgroundColor: currentChapter.surfaceColor }}
               >
                 {HERO_CHAPTERS.map((chap, idx) => (
@@ -271,7 +273,9 @@ export function HeroEditorial({
                       </h2>
                     </div>
                     <span className="text-sm font-bold text-[#142220] whitespace-nowrap tabular-nums">
-                      AED {featuredProduct.priceAed.toLocaleString()}
+                      {featuredProduct.priceRangeMaxAed
+                        ? `${formatAed(featuredProduct.priceAed)} – ${formatAed(featuredProduct.priceRangeMaxAed)}`
+                        : formatAed(featuredProduct.priceAed)}
                     </span>
                   </div>
 
