@@ -17,6 +17,8 @@ import { HomeSections } from './components/HomeSections';
 import { OrderConfirmationPage } from './components/OrderConfirmationPage';
 import { ProductDetailView } from './components/ProductDetailView';
 import { QuickViewModal } from './components/QuickViewModal';
+import { Testimonials } from './components/Testimonials';
+import { WhatsAppHelpButton } from './components/WhatsAppHelpButton';
 import { CATEGORY_DIRECTORY, PRODUCTS } from './data/catalog';
 import { auth } from './lib/firebase';
 import {
@@ -106,6 +108,14 @@ function getInitialRoute(): PageRoute {
   return 'home';
 }
 
+function getInitialProduct(): Product | null {
+  if (typeof window === 'undefined') return null;
+  const params = new URLSearchParams(window.location.search);
+  const productId = params.get('product');
+  if (!productId) return null;
+  return PRODUCTS.find((p) => p.id === productId) || null;
+}
+
 export default function App() {
   const [showIntro, setShowIntro] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -119,7 +129,14 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isShopPanelOpen, setIsShopPanelOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(
+    getInitialProduct
+  );
+  const pendingUrlProductIdRef = useRef<string | null>(
+    typeof window !== 'undefined'
+      ? new URLSearchParams(window.location.search).get('product')
+      : null
+  );
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
   const [toastNotice, setToastNotice] = useState<ToastBagNotice | null>(null);
   const toastTimerRef = useRef<number | null>(null);
@@ -210,14 +227,38 @@ export default function App() {
     };
   }, []);
 
-  // Keep selected product synced if edited live by admin
+  // Keep selected product synced if edited live by admin, or resolve deep-linked Firestore product
   useEffect(() => {
+    if (!selectedProduct && pendingUrlProductIdRef.current) {
+      const targetId = pendingUrlProductIdRef.current;
+      const match = liveProducts.find((p) => p.id === targetId);
+      if (match) {
+        pendingUrlProductIdRef.current = null;
+        setSelectedProduct(match);
+      }
+      return;
+    }
     if (!selectedProduct) return;
     const updated = liveProducts.find((p) => p.id === selectedProduct.id);
     if (updated && updated !== selectedProduct) {
       setSelectedProduct(updated);
     }
   }, [liveProducts, selectedProduct]);
+
+  // Sync ?product=<id> query parameter cleanly for direct sharing
+  useEffect(() => {
+    if (typeof window === 'undefined' || activeRoute === 'admin') return;
+    const url = new URL(window.location.href);
+    if (selectedProduct) {
+      if (url.searchParams.get('product') !== selectedProduct.id) {
+        url.searchParams.set('product', selectedProduct.id);
+        window.history.replaceState(null, '', url.toString());
+      }
+    } else if (url.searchParams.has('product') && !pendingUrlProductIdRef.current) {
+      url.searchParams.delete('product');
+      window.history.replaceState(null, '', url.toString());
+    }
+  }, [selectedProduct, activeRoute]);
 
   // Firebase Auth listener, Server-Verified Admin RBAC & Firestore Subscriptions
   useEffect(() => {
@@ -375,6 +416,7 @@ export default function App() {
   };
 
   const handleNavigate = (route: PageRoute) => {
+    pendingUrlProductIdRef.current = null;
     setSelectedProduct(null);
     setActiveRoute(route);
     setIsShopPanelOpen(false);
@@ -382,6 +424,7 @@ export default function App() {
   };
 
   const handleSelectProduct = (product: Product) => {
+    pendingUrlProductIdRef.current = null;
     setQuickViewProduct(null);
     setIsSearchOpen(false);
     setSelectedProduct(product);
@@ -688,6 +731,10 @@ export default function App() {
                     wishlistIds={wishlist}
                     onToggleWishlist={handleToggleWishlist}
                   />
+                  <Testimonials
+                    products={liveProducts}
+                    onSelectProduct={handleSelectProduct}
+                  />
                 </>
               ) : activeRoute === 'checkout' ? (
                 <div className="pt-16 sm:pt-20">
@@ -744,7 +791,11 @@ export default function App() {
               ) : activeRoute === 'about' ||
                 activeRoute === 'contact' ||
                 activeRoute === 'journal' ? (
-                <BrandPages route={activeRoute} onNavigate={handleNavigate} />
+                <BrandPages
+                  route={activeRoute}
+                  onNavigate={handleNavigate}
+                  supportPhone={storeSettings.supportPhone}
+                />
               ) : (
                 <CategoryViews
                   route={activeRoute}
@@ -767,6 +818,7 @@ export default function App() {
         onOpenAuth={handleOpenAuth}
         isSignedIn={Boolean(currentUser)}
         isAdmin={isAdminVerified}
+        supportPhone={storeSettings.supportPhone}
       />
 
       <QuickViewModal
@@ -810,6 +862,12 @@ export default function App() {
           setIsCartOpen(true);
         }}
         hasStickyBottomBar={Boolean(selectedProduct)}
+      />
+
+      <WhatsAppHelpButton
+        phone={storeSettings.supportPhone}
+        productName={selectedProduct?.name}
+        hasMobileBottomBar={Boolean(selectedProduct)}
       />
     </div>
   );

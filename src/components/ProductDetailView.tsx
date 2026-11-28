@@ -1,16 +1,21 @@
-import { useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowLeft,
   Check,
+  Copy,
   Heart,
   Layers,
+  Mail,
   Maximize2,
+  MessageCircle,
   Minus,
   Package,
   Plus,
+  Share2,
   ShieldCheck,
   Truck,
   Weight,
+  X,
   ZoomIn,
   ArrowRight,
   Star,
@@ -59,11 +64,93 @@ export function ProductDetailView({
   const [quantity, setQuantity] = useState(1);
   const [zoomed, setZoomed] = useState(false);
   const [justAdded, setJustAdded] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
 
   const unitPriceAed = getProductUnitPrice(product, selectedConfig);
 
   const mobileCarouselRef = useRef<HTMLDivElement | null>(null);
+  const shareMenuRef = useRef<HTMLDivElement | null>(null);
   const activePhoto = gallery[selectedImageIdx] || gallery[0];
+
+  const shareUrl = useMemo(() => {
+    if (typeof window === 'undefined') return '';
+    const url = new URL(window.location.href);
+    url.searchParams.delete('view');
+    url.searchParams.set('product', product.id);
+    url.hash = '';
+    return url.toString();
+  }, [product.id]);
+
+  const shareText = `${product.name} — ${formatAed(unitPriceAed)} at PLAYPEN UAE`;
+  const canNativeShare =
+    typeof navigator !== 'undefined' && typeof navigator.share === 'function';
+
+  useEffect(() => {
+    if (!shareOpen) return;
+    const onPointerDown = (e: MouseEvent) => {
+      if (shareMenuRef.current && !shareMenuRef.current.contains(e.target as Node)) {
+        setShareOpen(false);
+      }
+    };
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setShareOpen(false);
+    };
+    document.addEventListener('mousedown', onPointerDown);
+    window.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', onPointerDown);
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  }, [shareOpen]);
+
+  const handleCopyShareLink = async () => {
+    if (!shareUrl) return;
+    let copied = false;
+    try {
+      if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+        await navigator.clipboard.writeText(shareUrl);
+        copied = true;
+      }
+    } catch {
+      copied = false;
+    }
+
+    if (!copied && typeof document !== 'undefined') {
+      const textarea = document.createElement('textarea');
+      textarea.value = shareUrl;
+      textarea.setAttribute('readonly', '');
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        copied = document.execCommand('copy');
+      } catch {
+        copied = false;
+      }
+      document.body.removeChild(textarea);
+    }
+
+    if (copied) {
+      setLinkCopied(true);
+      window.setTimeout(() => setLinkCopied(false), 2200);
+    }
+  };
+
+  const handleNativeShare = async () => {
+    if (!canNativeShare || !shareUrl) return;
+    try {
+      await navigator.share({
+        title: product.name,
+        text: shareText,
+        url: shareUrl,
+      });
+      setShareOpen(false);
+    } catch {
+      // User dismissed native share sheet or sharing was cancelled
+    }
+  };
 
   const handleSelectSlide = (idx: number) => {
     setSelectedImageIdx(idx);
@@ -455,14 +542,140 @@ export function ProductDetailView({
                 </button>
               </div>
 
-              <button
-                onClick={handleBuyNow}
-                disabled={!product.inStock}
-                className="w-full h-12 rounded-full border border-[#142220] text-[#142220] text-sm font-semibold hover:bg-[#E6EAE4] disabled:opacity-50 transition-colors flex items-center justify-center gap-2 cursor-pointer"
-              >
-                Buy Now
-                <ArrowRight className="w-4 h-4" />
-              </button>
+              <div className="flex items-center gap-2.5">
+                <button
+                  onClick={handleBuyNow}
+                  disabled={!product.inStock}
+                  className="flex-1 h-12 rounded-full border border-[#142220] text-[#142220] text-sm font-semibold hover:bg-[#E6EAE4] disabled:opacity-50 transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  Buy Now
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+
+                <div ref={shareMenuRef} className="relative shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => setShareOpen((prev) => !prev)}
+                    aria-expanded={shareOpen}
+                    aria-haspopup="dialog"
+                    aria-label="Share this product"
+                    className={`h-12 px-5 rounded-full border text-sm font-semibold transition-colors inline-flex items-center justify-center gap-2 cursor-pointer ${
+                      shareOpen
+                        ? 'border-[#142220] bg-[#142220] text-[#FAFAF8]'
+                        : 'border-[#142220]/20 bg-white text-[#142220] hover:bg-[#E6EAE4]'
+                    }`}
+                  >
+                    <Share2 className="w-4 h-4" />
+                    <span>Share</span>
+                  </button>
+
+                  {shareOpen && (
+                    <div
+                      role="dialog"
+                      aria-label="Share product options"
+                      className="absolute right-0 bottom-14 z-40 w-[min(320px,calc(100vw-2rem))] rounded-2xl bg-[#FAFAF8] border border-[#142220]/15 shadow-[0_20px_50px_rgba(20,34,32,0.16)] p-4 space-y-3"
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="text-xs font-bold uppercase tracking-[0.08em] text-[#142220]">
+                          Share Product
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => setShareOpen(false)}
+                          aria-label="Close share options"
+                          className="w-7 h-7 rounded-full flex items-center justify-center text-[#4A5B57] hover:bg-[#E6EAE4] hover:text-[#142220] cursor-pointer"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+
+                      <div className="flex items-center gap-2 rounded-xl bg-[#F1F3EF] border border-[#142220]/10 p-1.5 pl-3">
+                        <input
+                          type="text"
+                          readOnly
+                          value={shareUrl}
+                          onFocus={(e) => e.currentTarget.select()}
+                          aria-label="Direct product link"
+                          className="flex-1 min-w-0 bg-transparent text-xs text-[#3C4B48] focus:outline-none truncate"
+                        />
+                        <button
+                          type="button"
+                          onClick={handleCopyShareLink}
+                          className={`shrink-0 min-h-[34px] px-3 py-1.5 rounded-lg text-xs font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer ${
+                            linkCopied
+                              ? 'bg-[#2B5B51] text-white'
+                              : 'bg-[#142220] text-[#FAFAF8] hover:bg-[#2B5B51]'
+                          }`}
+                        >
+                          {linkCopied ? (
+                            <>
+                              <Check className="w-3.5 h-3.5" />
+                              <span>Copied</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="w-3.5 h-3.5" />
+                              <span>Copy Link</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2 text-xs font-semibold">
+                        <a
+                          href={`https://wa.me/?text=${encodeURIComponent(`${shareText} ${shareUrl}`)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={() => setShareOpen(false)}
+                          className="min-h-[40px] px-3 py-2 rounded-xl bg-[#F1F3EF] hover:bg-[#E6EAE4] text-[#142220] inline-flex items-center gap-2 transition-colors"
+                        >
+                          <MessageCircle className="w-3.5 h-3.5 text-[#2B5B51] shrink-0" />
+                          <span>WhatsApp</span>
+                        </a>
+                        <a
+                          href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={() => setShareOpen(false)}
+                          className="min-h-[40px] px-3 py-2 rounded-xl bg-[#F1F3EF] hover:bg-[#E6EAE4] text-[#142220] inline-flex items-center gap-2 transition-colors"
+                        >
+                          <Share2 className="w-3.5 h-3.5 text-[#2B5B51] shrink-0" />
+                          <span>Facebook</span>
+                        </a>
+                        <a
+                          href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={() => setShareOpen(false)}
+                          className="min-h-[40px] px-3 py-2 rounded-xl bg-[#F1F3EF] hover:bg-[#E6EAE4] text-[#142220] inline-flex items-center gap-2 transition-colors"
+                        >
+                          <Share2 className="w-3.5 h-3.5 text-[#2B5B51] shrink-0" />
+                          <span>X / Twitter</span>
+                        </a>
+                        <a
+                          href={`mailto:?subject=${encodeURIComponent(product.name)}&body=${encodeURIComponent(`${shareText}\n\n${shareUrl}`)}`}
+                          onClick={() => setShareOpen(false)}
+                          className="min-h-[40px] px-3 py-2 rounded-xl bg-[#F1F3EF] hover:bg-[#E6EAE4] text-[#142220] inline-flex items-center gap-2 transition-colors"
+                        >
+                          <Mail className="w-3.5 h-3.5 text-[#2B5B51] shrink-0" />
+                          <span>Email</span>
+                        </a>
+                      </div>
+
+                      {canNativeShare && (
+                        <button
+                          type="button"
+                          onClick={handleNativeShare}
+                          className="w-full min-h-[40px] px-3 py-2 rounded-xl border border-[#142220]/15 text-xs font-semibold text-[#142220] hover:bg-[#E6EAE4] inline-flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                        >
+                          <Share2 className="w-3.5 h-3.5" />
+                          <span>More Share Options</span>
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
 
             {/* Key Specifications Grid */}

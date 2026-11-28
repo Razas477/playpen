@@ -108,7 +108,7 @@ export const DEFAULT_STORE_SETTINGS: StoreSettings = {
   freeShippingThresholdAed: 750,
   standardDeliveryFeeAed: 45,
   defaultCourierName: 'PLAYPEN White-Glove UAE',
-  supportPhone: '+971 4 555 0192',
+  supportPhone: '+92 3346275976',
   atelierLocation: 'Dubai Design District (d3), Building 7',
 };
 
@@ -1172,9 +1172,14 @@ export function subscribeToStoreSettings(
       const normalizedCourier = data.defaultCourierName?.includes('Maison Nour')
         ? DEFAULT_STORE_SETTINGS.defaultCourierName
         : data.defaultCourierName || DEFAULT_STORE_SETTINGS.defaultCourierName;
+      const normalizedSupportPhone =
+        !data.supportPhone || data.supportPhone.trim() === '+971 4 555 0192'
+          ? DEFAULT_STORE_SETTINGS.supportPhone
+          : data.supportPhone;
       onData({
         ...data,
         defaultCourierName: normalizedCourier,
+        supportPhone: normalizedSupportPhone,
       });
     },
     () => {

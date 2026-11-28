@@ -1,13 +1,15 @@
 import { useState } from 'react';
-import { ArrowRight, CheckCircle2, MapPin, Phone, Mail, Clock, BookOpen } from 'lucide-react';
+import { ArrowRight, CheckCircle2, MapPin, Phone, Mail, Clock, BookOpen, MessageCircle } from 'lucide-react';
 import { motion } from 'motion/react';
 import { PLAYPEN_IMAGES } from '../data/catalog';
 import { PageRoute } from '../types/store';
 import { ResilientImage } from './ResilientImage';
+import { buildWhatsAppHelpUrl, DEFAULT_WHATSAPP_PHONE } from './WhatsAppHelpButton';
 
 interface BrandPagesProps {
   route: 'about' | 'contact' | 'journal';
   onNavigate: (route: PageRoute) => void;
+  supportPhone?: string;
 }
 
 const JOURNAL_ESSAYS = [
@@ -46,7 +48,8 @@ const JOURNAL_ESSAYS = [
   },
 ];
 
-export function BrandPages({ route, onNavigate }: BrandPagesProps) {
+export function BrandPages({ route, onNavigate, supportPhone }: BrandPagesProps) {
+  const contactPhone = supportPhone?.trim() || DEFAULT_WHATSAPP_PHONE;
   const [submitted, setSubmitted] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -301,12 +304,23 @@ export function BrandPages({ route, onNavigate }: BrandPagesProps) {
             <div className="pt-2 space-y-2 text-xs sm:text-sm font-medium text-[#3C4B48]">
               <p className="flex items-center gap-2">
                 <Phone className="w-4 h-4 text-[#2B5B51]" />
-                <span>+971 4 555 0192 (UAE Customer Support)</span>
+                <span>{contactPhone} (UAE Customer Support)</span>
               </p>
               <p className="flex items-center gap-2">
                 <Mail className="w-4 h-4 text-[#2B5B51]" />
                 <span>concierge@playpen.ae</span>
               </p>
+              <div className="pt-2">
+                <a
+                  href={buildWhatsAppHelpUrl(contactPhone)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2.5 px-5 py-3 rounded-full bg-[#142220] text-[#FAFAF8] text-xs sm:text-sm font-semibold hover:bg-[#2B5B51] transition-colors shadow-sm"
+                >
+                  <MessageCircle className="w-4 h-4 text-[#25D366]" />
+                  <span>Chat on WhatsApp for Help</span>
+                </a>
+              </div>
             </div>
           </div>
         </div>

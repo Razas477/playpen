@@ -1,11 +1,13 @@
-import { ShieldCheck } from 'lucide-react';
+import { MessageCircle, ShieldCheck } from 'lucide-react';
 import { PageRoute } from '../types/store';
+import { buildWhatsAppHelpUrl } from './WhatsAppHelpButton';
 
 interface FooterProps {
   onNavigate: (route: PageRoute) => void;
   onOpenAuth: () => void;
   isSignedIn: boolean;
   isAdmin: boolean;
+  supportPhone?: string;
 }
 
 export function Footer({
@@ -13,6 +15,7 @@ export function Footer({
   onOpenAuth,
   isSignedIn,
   isAdmin,
+  supportPhone,
 }: FooterProps) {
   return (
     <footer className="bg-[#142220] text-[#FAFAF8] border-t border-[#FAFAF8]/10">
@@ -141,6 +144,17 @@ export function Footer({
                 >
                   Saved Addresses
                 </button>
+              </li>
+              <li>
+                <a
+                  href={buildWhatsAppHelpUrl(supportPhone)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="py-1.5 inline-flex items-center gap-1.5 hover:text-white transition-colors"
+                >
+                  <MessageCircle className="w-3.5 h-3.5 text-[#25D366]" />
+                  <span>WhatsApp Help</span>
+                </a>
               </li>
               {isAdmin && (
                 <li>
